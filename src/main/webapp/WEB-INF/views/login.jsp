@@ -155,7 +155,7 @@
 			<div class="description">
 				<h4>
 					Not yet a member? <br> <br> <a
-						class="label label-success" href="<c:url value="/registro"/>"
+						class="label label-success" href="<c:url value="/register"/>"
 						tabindex="4"> Register </a>
 				</h4>
 			</div>

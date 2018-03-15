@@ -94,7 +94,7 @@
 							</c:if>
 
 							<c:if test="${pageContext.request.userPrincipal.name == null}">
-								<li><a href="<c:url value="/registro" />"> <span
+								<li><a href="<c:url value="/register" />"> <span
 										class="glyphicon glyphicon-plus-sign"></span> Register
 								</a></li>
 								<li><a href="<c:url value="/login" />"> <span

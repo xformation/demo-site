@@ -44,9 +44,9 @@
 		<constructor-arg ref="amazonAWSCredentials" />
 		<property name="endpoint" value="${amazon.dynamodb.endpoint}" />
 	</bean>
-	<!-- <bean id="dynamoDBMapper" class="com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper">
-		<property name="dynamoDBClient" ref="amazonDynamoDB"/>
-	</bean> -->
+	<bean id="dynamoDBMapper" class="com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper">
+		<constructor-arg ref="amazonDynamoDB"/>
+	</bean>
 
 	<!-- commons beans -->
 	<bean id="esEventPublisher" class="com.synectiks.commons.publisher.ESEventPublisher"/>
