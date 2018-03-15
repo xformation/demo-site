@@ -10,7 +10,7 @@
 
 		<form:form
 			action="${pageContext.request.contextPath}/admin/inventory/edit"
-			method="post" commandName="product" enctype="multipart/form-data">
+			method="post" modelAttribute="product" enctype="multipart/form-data">
 			<form:hidden path="product_id" value="${product.product_id}" />
 
 			<div class="form-group">

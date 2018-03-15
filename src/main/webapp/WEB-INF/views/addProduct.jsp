@@ -10,7 +10,7 @@
 
 		<form:form
 			action="${pageContext.request.contextPath}/admin/inventory/add"
-			method="post" commandName="product" enctype="multipart/form-data">
+			method="post" modelAttribute="product" enctype="multipart/form-data">
 
 			<div class="form-group">
 				<label for="name"> Product name</label>

@@ -15,6 +15,7 @@ import com.synectiks.commons.utils.IUtils;
 import com.synectiks.demo.site.repositories.BillingRepository;
 import com.synectiks.demo.site.repositories.CustomerRepository;
 import com.synectiks.demo.site.repositories.ShippingRepository;
+import com.synectiks.demo.site.wrappers.CustomerWrapper;
 
 /**
  * @author Rajesh
@@ -31,24 +32,23 @@ public class RegisterController {
 
 	@RequestMapping("/register")
 	public String register(Model model) {
-		Customer customer = new Customer();
-		BillingAddress billing = billingRepo.save(new BillingAddress());
-		ShippingAddress shipping = shippingRepo.save(new ShippingAddress());
+		CustomerWrapper wrapper = new CustomerWrapper();
+		wrapper.setCustomer(new Customer());
+		wrapper.setBilling(new BillingAddress());
+		wrapper.setShipping(new ShippingAddress());
 
-		customer.setBillingId(billing.getId());
-		customer.setShippingId(shipping.getId());
-
-		model.addAttribute("customer", customer);
+		model.addAttribute("wrapper", wrapper);
 
 		return "registerCustomer";
 	}
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public String registerPost(@ModelAttribute("customer") Customer customer,
+	public String registerPost(@ModelAttribute("wrapper") CustomerWrapper wrapper,
 			BindingResult result, Model model, String username) {
-		if (result.hasErrors() || IUtils.isNull(customer)) {
+		if (result.hasErrors() || IUtils.isNull(wrapper)) {
 			return "registerCustomer";
 		}
+		Customer customer = wrapper.getCustomer();
 		// Check if email exists
 		if (!IUtils.isNullOrEmpty(customer.getEmail())) {
 			Customer cust = customerRepo.findByEmail(customer.getEmail());
@@ -65,9 +65,19 @@ public class RegisterController {
 				return "registerCustomer";
 			}
 		}
-
+		BillingAddress billing = wrapper.getBilling();
+		billing = billingRepo.save(billing);
+		ShippingAddress shipping = wrapper.getShipping();
+		shipping = shippingRepo.save(shipping);
+		customer.setBillingId(billing.getId());
+		customer.setShippingId(shipping.getId());
 		customer.setEnabled(true);
-		customerRepo.save(customer);
+		customer = customerRepo.save(customer);
+		// set customer id in addresses
+		shipping.setCustomerId(customer.getId());
+		shippingRepo.save(shipping);
+		billing.setCustomerId(customer.getId());
+		billingRepo.save(billing);
 		return "registerCustomerSuccess";
 	}
 }
