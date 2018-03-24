@@ -1,25 +1,35 @@
 package com.synectiks.demo.site.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.synectiks.commons.entities.demo.Product;
-import com.synectiks.demo.site.repositories.ProductRepository;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.synectiks.commons.entities.demo.Product;
+import com.synectiks.commons.utils.IUtils;
+import com.synectiks.demo.site.dto.ProductDTO;
+import com.synectiks.demo.site.repositories.ProductRepository;
+import com.synectiks.demo.site.utils.IDemoUtils;
 
 /**
  * @author Rajesh
@@ -28,6 +38,7 @@ import java.util.Map;
 @RequestMapping("/admin")
 public class AdminProductController {
 
+	private static final Logger logger = LoggerFactory.getLogger(AdminProductController.class);
 	private static Map< String, String > categories = new LinkedHashMap<>();
 
 	static {
@@ -48,29 +59,44 @@ public class AdminProductController {
 	private ProductRepository prodRepo;
 
 	@RequestMapping("/inventory/add")
-	public String addProduct(Model model) {
-		Product product = new Product();
+	public ModelAndView addProduct(ModelMap model) {
+		ProductDTO product = new ProductDTO();
 		product.setCondition("New");
 		model.addAttribute("categoryList", categories);
-		model.addAttribute(product);
+		model.addAttribute("productDTO", product);
 
-		return "addProduct";
+		return new ModelAndView("addProduct");
 	}
 
 	@RequestMapping(value = "/inventory/add", method = RequestMethod.POST)
-	public String addProductPost(@ModelAttribute("product") Product product,
-			BindingResult result, HttpServletRequest request, Model model) {
+	public String addProductPost(@Valid @ModelAttribute("productDTO") ProductDTO productDTO,
+			BindingResult result, HttpServletRequest request, ModelMap model) {
+		logger.info("Obj: " + productDTO + "\n" + model);
 		model.addAttribute("categoryList", categories);
-
 		if (result.hasErrors()) {
-			return "addProduct";
+			return "redirect:/admin/inventory/add";
 		}
-		prodRepo.save(product);
-		MultipartFile image = product.getImage();
-		String root_directory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(root_directory + "\\WEB-INF\\resources\\product_images\\"
-				+ product.getId() + ".png");
+		if (!IUtils.isNull(productDTO)) {
+			if (IUtils.isNullOrEmpty(productDTO.getName()))
+				result.addError(new FieldError("productDTO", "name", "Product name is null."));
+			if (IUtils.isNullOrEmpty(productDTO.getManufacturer()))
+				result.addError(new FieldError("productDTO", "manufacturer", "Product manufacturer is null."));
+			if (productDTO.getPrice() <= 0)
+				result.addError(new FieldError("productDTO", "price", "Product price must be > 0"));
 
+			if (result.hasErrors()) {
+				return "redirect:/admin/inventory/add";
+			}
+		}
+		MultipartFile image = productDTO.getImage();
+		Product entity = IDemoUtils.createCopyProperties(productDTO, Product.class);
+		entity = prodRepo.save(entity);
+		productDTO = IDemoUtils.createCopyProperties(entity, ProductDTO.class);
+		logger.info("Product: " + productDTO.getId());
+		String root_directory = request.getSession().getServletContext().getRealPath("/");
+		path = Paths.get(root_directory + "/resources/product_images/"
+				+ productDTO.getId() + ".png");
+		logger.info("image path: " + path);
 		if (image != null && !image.isEmpty()) {
 			try {
 				image.transferTo(new File(path.toString()));
@@ -82,9 +108,9 @@ public class AdminProductController {
 		return "redirect:/admin/inventory";
 	}
 
-	@RequestMapping("/inventory/edit/{productId}")
-	public String editProduct(@PathVariable("productId") String id, Model model) {
-		Product product = prodRepo.findById(id);
+	@RequestMapping("/inventory/edit/{id}")
+	public String editProduct(@PathVariable("id") String id, Model model) {
+		ProductDTO product = IDemoUtils.wrapInDTO(prodRepo.findById(id), ProductDTO.class);
 		model.addAttribute("categoryList", categories);
 		model.addAttribute("product", product);
 
@@ -92,42 +118,41 @@ public class AdminProductController {
 	}
 
 	@RequestMapping(value = "/inventory/edit", method = RequestMethod.POST)
-	public String editProductPost(@ModelAttribute("product") Product product,
+	public String editProductPost(@ModelAttribute("product") ProductDTO productDTO,
 			BindingResult result, Model model, HttpServletRequest request)
 			throws RuntimeException {
 		model.addAttribute("categoryList", categories);
 		if (result.hasErrors()) {
 			return "editProduct";
 		}
-		MultipartFile image = product.getImage();
+		MultipartFile image = productDTO.getImage();
 		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(rootDirectory + "\\WEB-INF\\resources\\product_images\\"
-				+ product.getId() + ".png");
+		path = Paths.get(rootDirectory + "/resources/product_images/"
+				+ productDTO.getId() + ".png");
 
 		if (image != null && !image.isEmpty()) {
 			try {
 				image.transferTo(new File(path.toString()));
 			} catch (Exception e) {
-				throw new RuntimeException(
-						"La imagen del product no pudo ser guardada.\n" + e);
+				throw new RuntimeException("The product image could not be saved." + e);
 			}
 		}
-		prodRepo.save(product);
+		prodRepo.save(IDemoUtils.createCopyProperties(productDTO, Product.class));
 
 		return "redirect:/admin/inventory";
 	}
 
-	@RequestMapping("/inventory/remove/{productId}")
-	public String deleteProduct(@PathVariable("productId") String id, Model model,
+	@RequestMapping("/inventory/remove/{id}")
+	public String deleteProduct(@PathVariable("id") String id, Model model,
 			HttpServletRequest request) {
 		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(rootDirectory + "\\WEB-INF\\resources\\product_images\\"
+		path = Paths.get(rootDirectory + "/resources/product_images/"
 				+ id + ".png");
 		if (Files.exists(path)) {
 			try {
 				Files.delete(path);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 		}
 		prodRepo.delete(id);

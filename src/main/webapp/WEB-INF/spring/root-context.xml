@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:webflow-config="http://www.springframework.org/schema/webflow-config"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 			http://www.springframework.org/schema/beans/spring-beans.xsd
-			http://www.springframework.org/schema/context
-			http://www.springframework.org/schema/context/spring-context.xsd
 			http://www.springframework.org/schema/webflow-config
 			http://www.springframework.org/schema/webflow-config/spring-webflow-config.xsd">
 
-	<!-- <context:annotation-config/>
-	<context:component-scan base-package="com.synecticks,"/> -->
-
 	<!-- Root Context: defines shared resources visible to all other web components -->
-	<bean id="demoProperties"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="demoProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:demo.properties" />
+	</bean>
+
+	<!-- Add multipart action handler bean -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="${file.upload.max.size}"/>
 	</bean>
 
 	<!-- Work-flow configuration for order handling -->

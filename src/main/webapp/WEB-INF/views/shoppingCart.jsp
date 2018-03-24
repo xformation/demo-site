@@ -20,7 +20,6 @@
 			<br>
 			<section class="container">
 				<div>
-
 					<div class="table-responsive">
 						<table class="table table-hoover table-condensed table-custom">
 							<td></td>
@@ -36,16 +35,17 @@
 								</tr>
 							</thead>
 							<tr ng-repeat="item in cart.cart_items">
-								<td colspan="2"><a
-									ng-href="/products/productDetails/{{item.product.product_id}}">{{item.product.name}}
+								<td colspan="2">
+									<a ng-href="/products/productDetails/{{item.product.product_id}}">{{item.product.name}}
 								</a></td>
 								<td>{{item.product.price | currency : $}}</td>
 								<td>{{item.quantity}}</td>
 								<td class="precio">{{item.price_total | currency : $}}</td>
-								<td><a href="#" class="btn btn-warning"
-									ng-click="removeFromCart(item.product.product_id)">
+								<td>
+									<a href="#" class="btn btn-warning" ng-click="removeFromCart(item.product.product_id)">
 										Remove product<span class="glyphicon glyphicon-remove"></span>
-								</a></td>
+									</a>
+								</td>
 							</tr>
 							<tr>
 								<td colspan="4"></td>
@@ -54,24 +54,30 @@
 								<td></td>
 							</tr>
 							<tr>
-								<td><a href="<spring:url value="/products" />"
-									class="btn btn-primary"> Add products <span
-										class="glyphicon glyphicon-plus"></span>
-								</a></td>
+								<td>
+									<a href="<spring:url value="/products"/>" class="btn btn-primary">
+										Add products
+										<span class="glyphicon glyphicon-plus"></span>
+									</a>
+								</td>
 								<td colspan="4"></td>
-								<td><a href="<spring:url value="/order/${cart_id}" />"
-									class="btn btn-success"> Complete the Purchase <span
-										class="glyphicon glyphicon-usd"></span>
-								</a></td>
+								<td>
+									<a href="<spring:url value="/order/${cart_id}"/>" class="btn btn-success">
+										Complete the Purchase
+										<span class="glyphicon glyphicon-usd"></span>
+									</a>
+								</td>
 								<td></td>
 							</tr>
 						</table>
 					</div>
 					<br>
 					<div class="pager" style="margin-top: 15px;">
-						<li><a href="javascript:history.back()"> <span
-								class="glyphicon glyphicon-backward"></span> return
-						</a></li>
+						<li>
+							<a href="javascript:history.back()">
+								 <span class="glyphicon glyphicon-backward"></span> return
+							</a>
+						</li>
 					</div>
 
 				</div>

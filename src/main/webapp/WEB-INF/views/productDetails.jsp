@@ -19,7 +19,7 @@
 
 		<div class="col-md-6">
 			<img class="img-responsive detalles"
-				src="<c:url value="/resources/product_images/${product.product_id}.png" />"
+				src="<c:url value="/resources/product_images/${product.id}.png" />"
 				alt="${product.name}">
 		</div>
 
@@ -48,7 +48,7 @@
 				</tr>
 				<tr>
 					<td><h4>Units available:</h4></td>
-					<td><h4>${product.availableUnit}</h4></td>
+					<td><h4>${product.stockCount}</h4></td>
 				</tr>
 				<tr>
 					<td><h4>Price:</h4></td>
@@ -66,13 +66,12 @@
 					<td rowspan="2">
 						<c:if test="${pageContext.request.userPrincipal.name != null}">
 							<a href="#" class="btn btn-primary"
-								ng-click="addToCart(${product.product_id})"
+								ng-click="addToCart(${product.id})"
 								data-toggle="modal" data-target="#myModal"> Buy <span
 								class="glyphicon glyphicon-usd"></span></a>
 						</c:if>
 						<c:if test="${pageContext.request.userPrincipal.name == null}">
-							<button type="button" href="<spring:url value="/login"/>"
-								class="btn btn-primary">
+							<button type="button" href="<spring:url value="/login"/>" class="btn btn-primary">
 								Login <span class="glyphicon glyphicon-usd"></span>
 							</button>
 						</c:if>

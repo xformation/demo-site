@@ -25,7 +25,7 @@
 			<c:forEach items="${productList}" var="product">
 				<div class="col-md-3 col-sm-6 hero-feature">
 					<div class="thumbnail">
-						<img src="<c:url value="/resources/product_images/${product.product_id}.png" />"
+						<img src="<c:url value="/resources/product_images/${product.id}.png" />"
 							alt="${product.name}">
 						<hr>
 						<div class="caption">
@@ -37,12 +37,12 @@
 							</p>
 
 							<p>
-								<a href="<spring:url value="/products/productDetails/${product.product_id}" />"
+								<a href="<spring:url value="/products/productDetails/${product.id}" />"
 									class="btn btn-info"> Details <span
 									class="glyphicon glyphicon-info-sign"></span>
 								</a>
 								<c:if test="${pageContext.request.userPrincipal.name != null}">
-									<a href="#" class="btn btn-primary" ng-click="addToCart(${product.product_id})"
+									<a href="#" class="btn btn-primary" ng-click="addToCart(${product.id})"
 										data-toggle="modal" data-target="#myModal"> Add
 										<span class="glyphicon glyphicon-usd"></span>
 									</a>

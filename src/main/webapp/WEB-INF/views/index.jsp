@@ -69,7 +69,7 @@
 			<h2>HD Cam Sumergible</h2>
 			<p>Do not miss any special moment, capture them in HD with our products.</p>
 			<p>
-				<a class="btn btn-default" href="/productos" role="button">more
+				<a class="btn btn-default" href="products" role="button">more
 					&raquo;</a>
 			</p>
 		</div>
@@ -80,7 +80,7 @@
 			<h2>Shelter for Lady</h2>
 			<p>Make the weather your best ally, wear your style with this seasonal coat.</p>
 			<p>
-				<a class="btn btn-default" href="/productos" role="button">more
+				<a class="btn btn-default" href="products" role="button">more
 					&raquo;</a>
 			</p>
 		</div>
@@ -91,7 +91,7 @@
 			<h2>Desktop Gamer</h2>
 			<p>Enjoy your games in HD with this desktop computer with graphics dedicated to give you the best gaming experience.</p>
 			<p>
-				<a class="btn btn-default" href="/productos" role="button">more
+				<a class="btn btn-default" href="products" role="button">more
 					&raquo;</a>
 			</p>
 		</div>

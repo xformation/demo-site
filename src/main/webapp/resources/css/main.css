@@ -2,7 +2,7 @@
     display: none !important;
 }
 
-.productos-bg {
+.products-bg {
     /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f9fcf7+0,f5f9f0+100;L+Green+3D */
     background: rgb(249, 252, 247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(249, 252, 247, 1) 0%, rgba(245, 249, 240, 1) 100%); /* FF3.6-15 */
@@ -55,7 +55,7 @@ strong {
     color: red;
     font-size: large;
 }
-/*productos.jsp*/
+/*product.jsp*/
 .caption {
     margin-top: 30px;
 }

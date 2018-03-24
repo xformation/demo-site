@@ -28,8 +28,7 @@
 				</thead>
 				<c:forEach items="${productList}" var="product">
 					<tr>
-						<td><img src="<c:url value="/resources/product_images/${product.product_id}.png" />"
-							alt="image"></td>
+						<td><img src="<c:url value="/resources/product_images/${product.id}.png"/>" alt="image"></td>
 						<td>${product.name}</td>
 						<td>${product.manufacturer}</td>
 						<td>${product.category}</td>
@@ -39,19 +38,19 @@
 								<fmt:formatNumber type="currency">${product.price}</fmt:formatNumber> $MXN
 							</p></td>
 						<td>
-							<a href="<spring:url value="/products/productDetails/${product.product_id}" />" class="btn btn-info">
+							<a href="<spring:url value="/products/productDetails/${product.id}" />" class="btn btn-info">
 							Details
 							<span class=" glyphicon glyphicon-info-sign"></span>
 						</a>
 						</td>
 						<td>
-							<a href="<spring:url value="/admin/inventory/edit/${product.product_id}" />" class="btn btn-success">
+							<a href="<spring:url value="/admin/inventory/edit/${product.id}" />" class="btn btn-success">
 							Edit
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						</td>
 						<td>
-							<a href="<spring:url value="/admin/inventory/remove/${product.product_id}" />" class="btn btn-danger">
+							<a href="<spring:url value="/admin/inventory/remove/${product.id}" />" class="btn btn-danger">
 							Remove
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -64,9 +63,11 @@
 			href="<spring:url value="/admin/inventory/add" />">Add product</a> <br>
 		<div class="pager">
 			<br>
-			<li><a href="<c:url value="/admin"/>">
-				<span class="glyphicon glyphicon-backward"></span> Return
-			</a></li>
+			<li>
+				<a href="<c:url value="/admin"/>">
+					<span class="glyphicon glyphicon-backward"></span> Return
+				</a>
+			</li>
 		</div>
 	</div>
 </div>

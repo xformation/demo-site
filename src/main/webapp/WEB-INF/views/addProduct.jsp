@@ -10,7 +10,7 @@
 
 		<form:form
 			action="${pageContext.request.contextPath}/admin/inventory/add"
-			method="post" modelAttribute="product" enctype="multipart/form-data">
+			method="post" modelAttribute="productDTO" enctype="multipart/form-data">
 
 			<div class="form-group">
 				<label for="name"> Product name</label>
@@ -20,61 +20,55 @@
 
 			<div class="form-group">
 				<label for="manufacturer"> Manufacturer </label>
-				<form:input path="manufacturer" id="manufacturer"
-					class="form-control" tabindex="2" />
+				<form:input path="manufacturer" id="manufacturer" class="form-control" tabindex="2" />
 			</div>
 
 			<div class="form-group">
 				<label for="category"> Category </label>
 				<form:errors path="category" cssStyle="color: red" />
-				<form:select path="category" id="category" class="form-control"
-					items="${category_list}" tabindex="3" />
+				<form:select path="category" id="category" class="form-control" items="${categoryList}" tabindex="3" />
 			</div>
 
 			<div class="form-group">
 				<label for="description"> Product description</label>
-				<form:textarea path="description" id="description"
-					class="form-control" tabindex="4" />
+				<form:textarea path="description" id="description" class="form-control" tabindex="4" />
 			</div>
 
 			<div class="form-group">
-				<label for="condition"> Product condition</label> <label
-					class="checkbox-inline">
-					<form:radiobutton path="condition"
-						id="condition" value="New" tabindex="5" /> New
-				</label> <label class="checkbox-inline"> <form:radiobutton
-						path="condicion" id="condicion" value="Usado" /> Used
+				<label for="condition"> Product condition</label>
+				<label class="checkbox-inline">
+					<form:radiobutton path="condition" id="condition" value="New" tabindex="5" /> New
+				</label>
+				<label class="checkbox-inline">
+					<form:radiobutton path="condition" id="condition" value="Used" /> Used
 				</label>
 			</div>
 
 			<div class="form-group">
 				<label for="price"> Price $MXN</label>
 				<form:errors path="price" cssStyle="color: red" />
-				<form:input path="price" id="price" class="form-control"
-					tabindex="6" />
+				<form:input path="price" id="price" class="form-control" tabindex="6" />
 			</div>
 
 			<div class="form-group">
-				<label for="availableUnit"> Units available </label>
-				<form:errors path="availableUnit" cssStyle="color: red" />
-				<form:input path="availableUnit"
-					id="availableUnit" class="form-control" tabindex="7" />
+				<label for="stockCount"> Units available </label>
+				<form:errors path="stockCount" cssStyle="color: red" />
+				<form:input path="stockCount" id="stockCount" class="form-control" tabindex="7" />
 			</div>
 
 			<%-- SUBIR IMAGEN DE PRODUCTO  ===================--%>
 			<div class="form-group">
-				<label class="control-label" for="image">Upload Image</label> <br>
-				<span>Recommended Size: 700 x 500.</span> <br>
-				<form:input path="image" id="image" type="file"
-					class="form:input-large" tabindex="8" size="2024000" />
+				<label class="control-label" for="image">Upload Image</label>
+				<br>
+				<span>Recommended Size: 700 x 500.</span>
+				<br>
+				<form:input path="image" id="image" type="file" class="form:input-large" tabindex="8" size="2024000" />
 				<br>
 			</div>
 
 			<%-- SUBMIT/CANCEL BUTTON  ===========--%>
-			<a href="<c:url value="/admin/inventory" />" class="btn btn-default"
-				tabindex="10"> Cancel </a>
-			<input type="submit" value="Add" class="btn btn-primary"
-				tabindex="9">
+			<a href="<c:url value="/admin/inventory" />" class="btn btn-default" tabindex="10"> Cancel </a>
+			<input type="submit" value="Add" class="btn btn-primary" tabindex="9">
 		</form:form>
 
 	</div>

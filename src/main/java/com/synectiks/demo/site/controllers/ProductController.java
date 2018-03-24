@@ -23,14 +23,14 @@ public class ProductController {
 	private ProductRepository productRepo;
 
 	@RequestMapping
-	public String getProductos(Model model) {
+	public String getProducts(Model model) {
 		List<Product> productList = (List<Product>) productRepo.findAll();
 		model.addAttribute("productList", productList);
 		return "products";
 	}
 
 	@RequestMapping("/productDetails/{productId}")
-	public String detallesProducto(@PathVariable String productId, Model model)
+	public String detallesProduct(@PathVariable String productId, Model model)
 			throws IOException {
 		Product product = productRepo.findById(productId);
 		model.addAttribute(product);

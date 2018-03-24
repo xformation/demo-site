@@ -20,10 +20,10 @@
 			</thead>
 			<c:forEach items="${customerList}" var="customer">
 				<tr>
-					<td>${customer.customer_name}</td>
-					<td>${customer.customer_email}</td>
-					<td>${customer.customer_phone}</td>
-					<td>${customer.customer_username}</td>
+					<td>${customer.name}</td>
+					<td>${customer.email}</td>
+					<td>${customer.phone}</td>
+					<td>${customer.username}</td>
 					<c:if test="${customer.enabled == true}">
 						<td>Active</td>
 					</c:if>

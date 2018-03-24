@@ -15,7 +15,6 @@
 				</div>
 			</section>
 			<c:redirect url="/login" />
-
 		</div>
 	</div>
 </div>

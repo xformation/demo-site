@@ -6,7 +6,7 @@
 	<br>
 	<div class="list-group">
 		<p class="list-group-item active">Operations</p>
-		<a class="list-group-item" href="<c:url value="/admin/inventario" />">
+		<a class="list-group-item" href="<c:url value="/admin/inventory" />">
 			<span class="glyphicon glyphicon-th-list"></span> PRODUCTS INVENTORY
 		</a> <a class="list-group-item" href="<c:url value="/admin/customer" /> ">
 			<span class="glyphicon glyphicon-user"></span> LIST OF USERS

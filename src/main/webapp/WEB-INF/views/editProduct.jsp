@@ -6,18 +6,16 @@
 <div class="container-wrapper">
 	<div class="container">
 		<h1>Modify Product</h1>
-		<br> <br>
-
-		<form:form
-			action="${pageContext.request.contextPath}/admin/inventory/edit"
-			method="post" modelAttribute="product" enctype="multipart/form-data">
-			<form:hidden path="product_id" value="${product.product_id}" />
+		<br>
+		<br>
+		<form:form action="${pageContext.request.contextPath}/admin/inventory/edit"
+				method="post" modelAttribute="product" enctype="multipart/form-data">
+			<form:hidden path="product_id" value="${product.id}" />
 
 			<div class="form-group">
 				<label for="name"> Product name</label>
 				<form:errors path="name" cssStyle="color: red" />
-				<form:input path="name" id="name" class="form-control"
-					value="${product.name}" />
+				<form:input path="name" id="name" class="form-control" value="${product.name}" />
 			</div>
 
 			<div class="form-group">
@@ -59,7 +57,7 @@
 				<label for="availableUnit"> Available units </label>
 				<form:errors path="availableUnit" cssStyle="color: red" />
 				<form:input path="availableUnit" id="availableUnit" class="form-control"
-					value="${product.availableUnit}" />
+					value="${product.stockCount}" />
 			</div>
 
 			<%-- Upload product image  ===================--%>
@@ -69,7 +67,7 @@
 			</div>
 
 			<%-- SUBMIT/CANCEL BUTTON  ===========--%>
-			<a href="<c:url value="/admin/inventario" />" class="btn btn-default"> Cancel </a>
+			<a href="<c:url value="/admin/inventory" />" class="btn btn-default"> Cancel </a>
 			<input type="submit" value="Save" class="btn btn-primary">
 		</form:form>
 

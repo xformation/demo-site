@@ -52,47 +52,62 @@
 								class="icon-bar"></span> <span class="icon-bar"></span> <span
 								class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="<c:url value="/" />" /> <img
-							src="<c:url value="/resources/site-images/itesca-store.png" />">
+						<a class="navbar-brand" href="<c:url value="/"/>">
+							<img src="<c:url value="/resources/site-images/itesca-store.png"/>"/>
 						</a>
 					</div>
 					<div id="navbar" class="navbar-collapse collapse">
 						<ul class="nav navbar-nav pull-left">
-							<li><a href="<c:url value="/"/>"> <span
-									class="glyphicon glyphicon-home"></span> Home
-							</a></li>
-							<li><a href="<c:url value="/products"/>"> <span
-									class="glyphicon glyphicon-th-list"></span> Product on sale
-							</a></li>
-							<c:if
-								test="${pageContext.request.userPrincipal.name != null && pageContext.request.userPrincipal.name != 'admin'}">
-								<li><a href="<c:url value="/customer/cart" />"> <span
-										class="glyphicon glyphicon-shopping-cart"></span> Shopping cart
-								</a></li>
+							<li>
+								<a href="<c:url value="/"/>">
+									<span class="glyphicon glyphicon-home"></span> Home
+								</a>
+							</li>
+							<li>
+								<a href="<c:url value="/products"/>">
+									<span class="glyphicon glyphicon-th-list"></span> Product on sale
+								</a>
+							</li>
+							<c:if test="${pageContext.request.userPrincipal.name != null && pageContext.request.userPrincipal.name != 'admin'}">
+								<li>
+									<a href="<c:url value="/customer/cart" />">
+										<span class="glyphicon glyphicon-shopping-cart"></span> Shopping cart
+									</a>
+								</li>
 							</c:if>
 							<c:if test="${pageContext.request.userPrincipal.name == 'admin'}">
-								<li><a href="<c:url value="/admin" />"> <span
-										class="glyphicon glyphicon-off"></span> Menu Administrator
-								</a></li>
+								<li>
+									<a href="<c:url value="/admin" />">
+										<span class="glyphicon glyphicon-off"></span> Menu Administrator
+									</a>
+								</li>
 							</c:if>
 						</ul>
 						<ul class="nav navbar-nav pull-right">
 							<c:if test="${pageContext.request.userPrincipal.name != null}">
-								<li><a> <span class="glyphicon glyphicon-user"></span>
+								<li>
+									<a> <span class="glyphicon glyphicon-user"></span>
 										${pageContext.request.userPrincipal.name}
-								</a></li>
-								<li><a href="<c:url value="/j_spring_security_logout" />">
+									</a>
+								</li>
+								<li>
+									<a href="<c:url value="/j_spring_security_logout" />">
 										<span class="glyphicon glyphicon-share-alt"></span> Logout
-								</a></li>
+									</a>
+								</li>
 							</c:if>
 
 							<c:if test="${pageContext.request.userPrincipal.name == null}">
-								<li><a href="<c:url value="/register" />"> <span
-										class="glyphicon glyphicon-plus-sign"></span> Register
-								</a></li>
-								<li><a href="<c:url value="/login" />"> <span
-										class="glyphicon glyphicon-user"></span> Log in
-								</a></li>
+								<li>
+									<a href="<c:url value="/register" />">
+										<span class="glyphicon glyphicon-plus-sign"></span> Register
+									</a>
+								</li>
+								<li>
+									<a href="<c:url value="/login" />">
+										<span class="glyphicon glyphicon-user"></span> Log in
+									</a>
+								</li>
 							</c:if>
 						</ul>
 					</div>
@@ -104,8 +119,7 @@
 
 	<div class="container">
 		<div class="page-header center">
-			<h1>
-				ITESCA Store <small>Log in</small>
+			<h1>ITESCA Store <small>Log in</small></h1>
 		</div>
 	</div>
 	<!-- Top content -->
@@ -126,27 +140,23 @@
 						</div>
 					</div>
 					<div class="form-bottom">
-						<form name="loginForm"
-							action="<c:url value="/j_spring_security_check" />" method="post">
+						<form name="loginForm" action="<c:url value="/j_spring_security_check" />" method="post">
 							<c:if test="${not empty error}">
 								<div class="error" style="color: red">${error}</div>
 							</c:if>
 							<div class="form-group">
-								<label class="sr-only" for="username">Username</label> <input
-									type="text" name="username" placeholder="Username"
+								<label class="sr-only" for="username">Username</label>
+								<input type="text" name="username" placeholder="Username"
 									class="form-username form-control" id="username" tabindex="1">
 							</div>
 							<div class="form-group">
-								<label class="sr-only" for="password"> Password
-								</label> <input type="password" name="password"
-									placeholder="Password"
+								<label class="sr-only" for="password"> Password </label>
+								<input type="password" name="password" placeholder="Password"
 									class="form-password form-control" id="password" tabindex="2">
 							</div>
 							<br>
-							<button type="submit" value="Submit" class="btn btn-primary"
-								tabindex="3">Log in</button>
-							<input type="hidden" name="${_csrf.parameterName}"
-								value="${csrf.token}" />
+							<button type="submit" value="Submit" class="btn btn-primary" tabindex="3">Log in</button>
+							<input type="hidden" name="${_csrf.parameterName}" value="${csrf.token}" />
 						</form>
 					</div>
 				</div>
@@ -154,8 +164,8 @@
 			<br> <br>
 			<div class="description">
 				<h4>
-					Not yet a member? <br> <br> <a
-						class="label label-success" href="<c:url value="/register"/>"
+					Not yet a member? <br> <br>
+					<a class="label label-success" href="<c:url value="/register"/>"
 						tabindex="4"> Register </a>
 				</h4>
 			</div>
