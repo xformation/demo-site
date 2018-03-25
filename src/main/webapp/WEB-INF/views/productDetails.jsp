@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 <%@include file="/WEB-INF/views/templates/header.jsp"%>
 
 <!-- Page Content -->
@@ -64,13 +65,13 @@
 						</div>
 					</td>
 					<td rowspan="2">
-						<c:if test="${pageContext.request.userPrincipal.name != null}">
+						<c:if test="${curCustomer != null}">
 							<a href="#" class="btn btn-primary"
-								ng-click="addToCart(${product.id})"
+								ng-click="addToCart('${curCustomer.username}', '${product.id}')"
 								data-toggle="modal" data-target="#myModal"> Buy <span
 								class="glyphicon glyphicon-usd"></span></a>
 						</c:if>
-						<c:if test="${pageContext.request.userPrincipal.name == null}">
+						<c:if test="${curCustomer == null}">
 							<button type="button" href="<spring:url value="/login"/>" class="btn btn-primary">
 								Login <span class="glyphicon glyphicon-usd"></span>
 							</button>
@@ -106,5 +107,5 @@
 
 <!-- /.row -->
 
-<script src="/resources/js/controller.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/resources/js/controller.js" type="text/javascript"></script>
 <%@include file="/WEB-INF/views/templates/footer.jsp"%>

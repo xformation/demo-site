@@ -10,7 +10,7 @@
 		<br>
 		<form:form action="${pageContext.request.contextPath}/admin/inventory/edit"
 				method="post" modelAttribute="product" enctype="multipart/form-data">
-			<form:hidden path="product_id" value="${product.id}" />
+			<form:hidden path="id" value="${product.id}" />
 
 			<div class="form-group">
 				<label for="name"> Product name</label>
@@ -54,9 +54,9 @@
 			</div>
 
 			<div class="form-group">
-				<label for="availableUnit"> Available units </label>
-				<form:errors path="availableUnit" cssStyle="color: red" />
-				<form:input path="availableUnit" id="availableUnit" class="form-control"
+				<label for="stockCount"> Available units </label>
+				<form:errors path="stockCount" cssStyle="color: red" />
+				<form:input path="stockCount" id="availableUnit" class="form-control"
 					value="${product.stockCount}" />
 			</div>
 

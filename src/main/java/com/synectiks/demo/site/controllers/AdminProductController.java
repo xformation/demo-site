@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -36,6 +37,7 @@ import com.synectiks.demo.site.utils.IDemoUtils;
  */
 @Controller
 @RequestMapping("/admin")
+@SessionAttributes("curCustomer")
 public class AdminProductController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdminProductController.class);
@@ -110,15 +112,15 @@ public class AdminProductController {
 
 	@RequestMapping("/inventory/edit/{id}")
 	public String editProduct(@PathVariable("id") String id, Model model) {
-		ProductDTO product = IDemoUtils.wrapInDTO(prodRepo.findById(id), ProductDTO.class);
+		ProductDTO productDTO = IDemoUtils.wrapInDTO(prodRepo.findById(id), ProductDTO.class);
 		model.addAttribute("categoryList", categories);
-		model.addAttribute("product", product);
+		model.addAttribute("product", productDTO);
 
 		return "editProduct";
 	}
 
 	@RequestMapping(value = "/inventory/edit", method = RequestMethod.POST)
-	public String editProductPost(@ModelAttribute("product") ProductDTO productDTO,
+	public String editProductPost(@ModelAttribute("productDTO") ProductDTO productDTO,
 			BindingResult result, Model model, HttpServletRequest request)
 			throws RuntimeException {
 		model.addAttribute("categoryList", categories);

@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
+
 <%@include file="/WEB-INF/views/templates/header.jsp"%>
 
 <br>
@@ -41,13 +42,14 @@
 									class="btn btn-info"> Details <span
 									class="glyphicon glyphicon-info-sign"></span>
 								</a>
-								<c:if test="${pageContext.request.userPrincipal.name != null}">
-									<a href="#" class="btn btn-primary" ng-click="addToCart(${product.id})"
+								<c:if test="${curCustomer != null}">
+									<a href="#" class="btn btn-primary"
+										ng-click="addToCart('${curCustomer.id}', '${product.id}')"
 										data-toggle="modal" data-target="#myModal"> Add
 										<span class="glyphicon glyphicon-usd"></span>
 									</a>
 								</c:if>
-								<c:if test="${pageContext.request.userPrincipal.name == null}">
+								<c:if test="${curCustomer == null}">
 									<a href="<c:url value="/login"/>" class="btn btn-primary">
 										Login <span class="glyphicon glyphicon-usd"></span>
 									</a>
@@ -87,5 +89,5 @@
 	</div>
 </div>
 
-<script src="/resources/js/controller.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/resources/js/controller.js" type="text/javascript"></script>
 <%@include file="/WEB-INF/views/templates/footer.jsp"%>

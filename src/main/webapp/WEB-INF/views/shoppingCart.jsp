@@ -3,7 +3,7 @@
 
 <div class="container-wrapper">
 	<div class="container" ng-app="cartApp" ng-cloak>
-		<div ng-controller="cartCtrl" ng-init="initCartId('${cart_id}')">
+		<div ng-controller="cartCtrl" ng-init="initCartId('${cartDTO.id}')">
 			<br>
 			<section>
 				<div class="row text">
@@ -34,15 +34,15 @@
 									</td>
 								</tr>
 							</thead>
-							<tr ng-repeat="item in cart.cart_items">
+							<tr ng-repeat="item in cartDTO.items">
 								<td colspan="2">
-									<a ng-href="/products/productDetails/{{item.product.product_id}}">{{item.product.name}}
+									<a ng-href="/products/productDetails/{{item.product.id}}">{{item.product.name}}
 								</a></td>
 								<td>{{item.product.price | currency : $}}</td>
 								<td>{{item.quantity}}</td>
-								<td class="precio">{{item.price_total | currency : $}}</td>
+								<td class="precio">{{item.totalPrice | currency : $}}</td>
 								<td>
-									<a href="#" class="btn btn-warning" ng-click="removeFromCart(item.product.product_id)">
+									<a href="#" class="btn btn-warning" ng-click="removeFromCart(item.product.id)">
 										Remove product<span class="glyphicon glyphicon-remove"></span>
 									</a>
 								</td>
@@ -62,7 +62,7 @@
 								</td>
 								<td colspan="4"></td>
 								<td>
-									<a href="<spring:url value="/order/${cart_id}"/>" class="btn btn-success">
+									<a href="<spring:url value="/order/${cart.id}"/>" class="btn btn-success">
 										Complete the Purchase
 										<span class="glyphicon glyphicon-usd"></span>
 									</a>
@@ -89,5 +89,5 @@
 <br>
 <br>
 
-<script src="/resources/js/controller.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/resources/js/controller.js" type="text/javascript"></script>
 <%@include file="/WEB-INF/views/templates/footer.jsp"%>

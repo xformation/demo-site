@@ -65,7 +65,7 @@
 									<span class="glyphicon glyphicon-th-list"></span> Products on sale
 								</a>
 							</li>
-							<c:if test="${pageContext.request.userPrincipal.name != null && pageContext.request.userPrincipal.name != 'admin'}">
+							<c:if test="${curCustomer != null && curCustomer.username != 'admin'}">
 								<li>
 									<a href="<c:url value="/customer/cart" />">
 										<span class="glyphicon glyphicon-shopping-cart"></span> Shopping cart
@@ -74,28 +74,27 @@
 							</c:if>
 						</ul>
 						<ul class="nav navbar-nav pull-right">
-							<c:if test="${pageContext.request.userPrincipal.name == 'admin'}">
+							<c:if test="${curCustomer.username == 'admin'}">
 								<li>
 									<a href="<c:url value="/admin"/>">
 										<span class="glyphicon glyphicon-off"></span> Menu Administrator
 									</a>
 								</li>
 							</c:if>
-							<c:if test="${pageContext.request.userPrincipal.name != null}">
+							<c:if test="${curCustomer != null}">
 								<li>
 									<a>
-										<span class="glyphicon glyphicon-user"></span>
-										${pageContext.request.userPrincipal.name}
+										<span class="glyphicon glyphicon-user"></span> ${curCustomer.username}
 									</a>
 								</li>
 								<li>
-									<a href="<c:url value="/j_spring_security_logout" />">
+									<a href="<c:url value="/login?logout" />">
 										<span class="glyphicon glyphicon-share-alt"></span> Logout
 									</a>
 								</li>
 							</c:if>
 
-							<c:if test="${pageContext.request.userPrincipal.name == null}">
+							<c:if test="${curCustomer == null}">
 								<li>
 									<a href="<c:url value="/register" />"> 
 										<span class="glyphicon glyphicon-plus-sign"></span> Register

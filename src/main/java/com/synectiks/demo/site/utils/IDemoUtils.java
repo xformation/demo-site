@@ -20,6 +20,8 @@ public interface IDemoUtils {
 
 	Logger logger = LoggerFactory.getLogger(IDemoUtils.class);
 
+	String CUR_CUSTOMER = "curCustomer";
+
 	/**
 	 * Method to load properties from source to cls object
 	 * using {@code BeanUtils#copyProperties(Object, Object)}

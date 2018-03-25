@@ -23,5 +23,5 @@
 <br>
 <br>
 
-<script src="/resources/js/controller.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/resources/js/controller.js" type="text/javascript"></script>
 <%@include file="/WEB-INF/views/templates/footer.jsp"%>
