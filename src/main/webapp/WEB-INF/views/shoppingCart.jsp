@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 <%@include file="/WEB-INF/views/templates/header.jsp"%>
 
 <div class="container-wrapper">
@@ -34,15 +35,15 @@
 									</td>
 								</tr>
 							</thead>
-							<tr ng-repeat="item in cartDTO.items">
+							<tr ng-repeat="item in cart.items">
 								<td colspan="2">
-									<a ng-href="/products/productDetails/{{item.product.id}}">{{item.product.name}}
-								</a></td>
+									<a ng-href="/demo.site/products/productDetails/{{item.product.id}}">{{item.product.name}}</a>
+								</td>
 								<td>{{item.product.price | currency : $}}</td>
 								<td>{{item.quantity}}</td>
 								<td class="precio">{{item.totalPrice | currency : $}}</td>
 								<td>
-									<a href="#" class="btn btn-warning" ng-click="removeFromCart(item.product.id)">
+									<a href="#" class="btn btn-warning" ng-click="removeFromCart(item.id)">
 										Remove product<span class="glyphicon glyphicon-remove"></span>
 									</a>
 								</td>

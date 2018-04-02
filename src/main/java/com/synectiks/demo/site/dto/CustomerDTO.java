@@ -1,6 +1,7 @@
 package com.synectiks.demo.site.dto;
 
 import com.synectiks.commons.entities.demo.Customer;
+import com.synectiks.commons.utils.IUtils;
 
 /**
  * @author Rajesh
@@ -103,5 +104,45 @@ public class CustomerDTO implements DemoDTO {
 	@Override
 	public Class<?> getEntityClass() {
 		return Customer.class;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		if (!IUtils.isNullOrEmpty(id)) {
+			builder.append("\"id\": \"" + id + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(name)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"name\": \"" + name + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(phone)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"phone\": \"" + phone + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(email)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"email\": \"" + email + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(username)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"username\": \"" + username + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(cartId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"cartId\": \"" + cartId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(billingId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"billingId\": \"" + billingId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(shippingId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"shippingId\": \"" + shippingId + "\"");
+		}
+		builder.append(", \"enabled\": " + enabled);
+		builder.append("}");
+		return builder.toString();
 	}
 }

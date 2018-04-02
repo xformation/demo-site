@@ -48,16 +48,22 @@ public class CartResources {
 	public @ResponseBody CartDTO getCartById(@PathVariable(value = "cartId") String cartId) {
 		logger.info("Cart: " + cartId);
 		CartDTO cart = null;
-		if (IUtils.isNullOrEmpty(cartId)) {
+		if (!IUtils.isNullOrEmpty(cartId)) {
 			cart = IDemoUtils.wrapInDTO(cartRepo.findById(cartId), CartDTO.class);
 		}
 		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
 			for (String itemId : cart.getCartItems()) {
 				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
 						itemId), CartItemDTO.class);
-				ProductDTO prod = IDemoUtils.wrapInDTO(
-						productRepo.findById(item.getProductId()), ProductDTO.class);
-				item.setProduct(prod);
+				logger.info(itemId + ": " + item);
+				if (!IUtils.isNull(item)) {
+					ProductDTO prod = IDemoUtils.wrapInDTO(
+							productRepo.findById(item.getProductId()), ProductDTO.class);
+					logger.info("Prod: " + prod);
+					if (!IUtils.isNull(prod)) {
+						item.setProduct(prod);
+					}
+				}
 				cart.addAnItem(item);
 			}
 		}
@@ -105,11 +111,16 @@ public class CartResources {
 		cartRepo.save(cart);
 	}
 
-	@RequestMapping(value = "/remove/{productId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/remove/{cartId}/{cartItemId}", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void removeItem(@PathVariable(value = "productId") String productId) {
-		CartItem cartItem = cartItemRepo.findByProductId(productId);
-		cartItemRepo.delete(cartItem);
+	public void removeItem(@PathVariable(value = "cartId") String cartId,
+			@PathVariable(value = "cartItemId") String cartItemId) {
+		// delete from repository
+		cartItemRepo.delete(cartItemId);
+		Cart cart = cartRepo.findById(cartId);
+		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
+			cart.getCartItems().remove(cartItemId);
+		}
 	}
 
 	@RequestMapping(value = "/{cartId}", method = RequestMethod.DELETE)

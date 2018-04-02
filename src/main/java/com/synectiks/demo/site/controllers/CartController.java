@@ -50,13 +50,21 @@ public class CartController {
 				customer.getUsername()), CustomerDTO.class);
 		Cart cart = null;
 		if (IUtils.isNullOrEmpty(customer.getCartId())) {
-			cart = cartRepo.save(new Cart());
-			customer.setCartId(cart.getId());
-			custRepo.save(IDemoUtils.createCopyProperties(customer, Customer.class));
+			cart = getNewCart(customer);
 		} else {
 			cart = cartRepo.findById(customer.getCartId());
+			if (IUtils.isNull(cart)) {
+				cart = getNewCart(customer);
+			}
 		}
 		return "redirect:/customer/cart/" + cart.getId();
+	}
+
+	private Cart getNewCart(CustomerDTO customer) {
+		Cart cart = cartRepo.save(new Cart());
+		customer.setCartId(cart.getId());
+		custRepo.save(IDemoUtils.createCopyProperties(customer, Customer.class));
+		return cart;
 	}
 
 	@RequestMapping("/{id}")
@@ -67,10 +75,14 @@ public class CartController {
 			for (String itemId : cartDTO.getCartItems()) {
 				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
 						itemId), CartItemDTO.class);
-				ProductDTO prod = IDemoUtils.wrapInDTO(
-						prodRepo.findById(item.getProductId()), ProductDTO.class);
-				item.setProduct(prod);
-				cartDTO.addAnItem(item);
+				if (!IUtils.isNull(item)) {
+					ProductDTO prod = IDemoUtils.wrapInDTO(
+							prodRepo.findById(item.getProductId()), ProductDTO.class);
+					if (!IUtils.isNull(item)) {
+						item.setProduct(prod);
+					}
+					cartDTO.addAnItem(item);
+				}
 			}
 		}
 		model.addAttribute("cartDTO", cartDTO);

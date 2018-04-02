@@ -63,4 +63,24 @@ public class CartItemDTO implements DemoDTO {
 			this.productId = product.getId();
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		if (!IUtils.isNullOrEmpty(id)) {
+			builder.append("\"id\": \"" + id + "\"");
+		}
+		builder.append(builder.length() > 2 ? ", " : "");
+		builder.append("\"quantity\": " + quantity);
+		if (!IUtils.isNullOrEmpty(productId)) {
+			builder.append(", \"productId\": \"" + productId + "\"");
+		}
+		builder.append(", \"totalPrice\": " + totalPrice);
+		if (!IUtils.isNull(product)) {
+			builder.append(", \"product\": " + product);
+		}
+		builder.append("}");
+		return builder.toString();
+	}
 }

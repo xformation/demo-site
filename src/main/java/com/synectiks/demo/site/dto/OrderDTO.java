@@ -1,6 +1,7 @@
 package com.synectiks.demo.site.dto;
 
 import com.synectiks.commons.entities.demo.CustomerOrder;
+import com.synectiks.commons.utils.IUtils;
 
 /**
  * @author Rajesh
@@ -58,5 +59,32 @@ public class OrderDTO implements DemoDTO {
 	@Override
 	public Class<?> getEntityClass() {
 		return CustomerOrder.class;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		if (!IUtils.isNullOrEmpty(id)) {
+			builder.append("\"id\": \"" + id + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(cartId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"cartId\": \"" + cartId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(customerId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"customerId\": \"" + customerId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(billingId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"billingId\": \"" + billingId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(shippingId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"shippingId\": \"" + shippingId + "\"");
+		}
+		builder.append("}");
+		return builder.toString();
 	}
 }

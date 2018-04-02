@@ -61,14 +61,17 @@ public class CartDTO implements DemoDTO {
 	}
 
 	public void addAnItem(CartItemDTO item) {
+		if (IUtils.isNull(item)) {
+			return;
+		}
 		if (IUtils.isNull(this.cartItems)) {
 			this.cartItems = new ArrayList<>();
 		}
 		if (!cartItems.contains(item.getId())) {
 			this.cartItems.add(item.getId());
 			this.grandTotal += item.getTotalPrice();
-			this.setItems(item);
 		}
+		this.setItems(item);
 	}
 
 	@Override
@@ -89,5 +92,30 @@ public class CartDTO implements DemoDTO {
 			this.items = new ArrayList<>();
 		}
 		this.items.add(item);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		if (!IUtils.isNullOrEmpty(id)) {
+			builder.append("\"id\": \"" + id + "\"");
+		}
+		if (!IUtils.isNull(cartItems)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"cartItems\": " + cartItems);
+		}
+		if (!IUtils.isNull(items)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"items\": " + items);
+		}
+		if (!IUtils.isNullOrEmpty(customerId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"customerId\": \"" + customerId + "\"");
+		}
+		builder.append(builder.length() > 2 ? ", " : "");
+		builder.append("\"grandTotal\": " + grandTotal);
+		builder.append("}");
+		return builder.toString();
 	}
 }

@@ -1,6 +1,7 @@
 package com.synectiks.demo.site.dto;
 
 import com.synectiks.commons.entities.demo.BillingAddress;
+import com.synectiks.commons.utils.IUtils;
 
 /**
  * @author Rajesh
@@ -68,5 +69,32 @@ public class BillingDTO implements DemoDTO {
 	@Override
 	public Class<?> getEntityClass() {
 		return BillingAddress.class;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		if (!IUtils.isNullOrEmpty(id)) {
+			builder.append("\"id\": \"" + id + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(cardHolder)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"cardHolder\": \"" + cardHolder + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(cardNumber)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"cardNumber\": \"" + cardNumber + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(customerId)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"customerId\": \"" + customerId + "\"");
+		}
+		if (!IUtils.isNullOrEmpty(expiryDate)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"expiryDate\": \"" + expiryDate + "\"");
+		}
+		builder.append("}");
+		return builder.toString();
 	}
 }
