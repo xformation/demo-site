@@ -14,7 +14,9 @@ cartApp.controller("cartCtrl", function ($scope, $http) {
         });
     };
     $scope.clearCart = function () {
-        $http.delete('/demo.site/rest/cart/' + $scope.cartId).success($scope.refreshCart());
+        $http.delete('/demo.site/rest/cart/' + $scope.cartId).success(function () {
+        	$scope.refreshCart();
+        });
     };
     $scope.initCartId = function (cart_id) {
         $scope.cartId = cart_id;
@@ -34,7 +36,7 @@ cartApp.controller("cartCtrl", function ($scope, $http) {
     $scope.calGrandTotal = function () {
         var grandTotal = 0;
         if (typeof($scope.cart) !== 'undefined') {
-        	if ($scope.cart.items !== null) {
+        	if (typeof($scope.cart.items) !== 'undefined' && $scope.cart.items !== null) {
 	            for (var i = 0; i < $scope.cart.items.length; i++) {
 	                grandTotal += $scope.cart.items[i].totalPrice;
 	            }

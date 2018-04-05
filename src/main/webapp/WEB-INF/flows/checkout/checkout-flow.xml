@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+			http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<var name="order" class="com.synectiks.demo.site.dto.OrderDTO" />
+
+	<action-state id="addCartToOrder">
+		<evaluate expression="commonDaoClass.validateCart(requestParameters.id)" result="order.cart" />
+		<evaluate expression="commonDaoClass.getCustomer(order.cart)" result="order.customer"/>
+		<evaluate expression="commonDaoClass.getShipping(order.customer)" result="order.shipping"/>
+		<evaluate expression="commonDaoClass.getBilling(order.customer)" result="order.billing"/>
+		<!-- Refill cutomer object with updated items -->
+		<evaluate expression="commonDaoClass.getCustomer(order.cart)" result="order.customer"/>
+		<transition to="InvalidCartWarning" on-exception="com.synectiks.commons.exceptions.SynectiksException" />
+		<transition to="collectCustomerInfo" />
+	</action-state>
+
+	<view-state id="collectCustomerInfo" view="collectCustomerInfo.jsp" model="order">
+		<transition on="customerInfoCollected" to="collectShippingDetail" />
+	</view-state>
+
+	<view-state id="collectShippingDetail" view="collectShippingDetail.jsp" model="order">
+		<transition on="shippingDetailCollected" to="orderConfirmation" />
+		<transition on="backToCollectCustomerInfo" to="collectCustomerInfo" />
+	</view-state>
+
+	<view-state id="orderConfirmation">
+		<transition on="orderConfirmed" to="processOrder" />
+		<transition on="backToCollectShippingDetail" to="collectShippingDetail" />
+	</view-state>
+
+	<action-state id="processOrder">
+		<evaluate expression="cartResources.clearCart(order.cartId)" />
+		<transition to="thanksCustomer" />
+	</action-state>
+
+	<view-state id="thanksCustomer" model="order">
+		<transition to="endState" />
+	</view-state>
+
+	<end-state id="endState" />
+
+	<view-state id="InvalidCartWarning">
+		<transition to="endState" />
+	</view-state>
+
+	<end-state id="cancelCheckout" view="checkOutCancelled.jsp" />
+
+	<global-transitions>
+		<transition on="cancel" to="cancelCheckout" />
+	</global-transitions>
+
+</flow>

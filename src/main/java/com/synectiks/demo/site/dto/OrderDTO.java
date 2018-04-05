@@ -15,6 +15,10 @@ public class OrderDTO implements DemoDTO {
 	private String customerId;
 	private String billingId;
 	private String shippingId;
+	private CartDTO cart;
+	private BillingDTO billing;
+	private CustomerDTO customer;
+	private ShippingDTO shipping;
 
 	public String getId() {
 		return id;
@@ -59,6 +63,38 @@ public class OrderDTO implements DemoDTO {
 	@Override
 	public Class<?> getEntityClass() {
 		return CustomerOrder.class;
+	}
+
+	public CartDTO getCart() {
+		return cart;
+	}
+
+	public void setCart(CartDTO cart) {
+		this.cart = cart;
+	}
+
+	public BillingDTO getBilling() {
+		return billing;
+	}
+
+	public void setBilling(BillingDTO billing) {
+		this.billing = billing;
+	}
+
+	public CustomerDTO getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(CustomerDTO customer) {
+		this.customer = customer;
+	}
+
+	public ShippingDTO getShipping() {
+		return shipping;
+	}
+
+	public void setShipping(ShippingDTO shipping) {
+		this.shipping = shipping;
 	}
 
 	@Override

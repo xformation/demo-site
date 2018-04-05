@@ -14,6 +14,7 @@ import com.synectiks.commons.entities.demo.Product;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.demo.site.dto.CartDTO;
 import com.synectiks.demo.site.dto.CartItemDTO;
+import com.synectiks.demo.site.dto.CustomerDTO;
 import com.synectiks.demo.site.dto.ProductDTO;
 import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.CartRepository;
@@ -75,25 +76,27 @@ public class CartResources {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void addItem(@PathVariable(value = "curUser") String curUser,
 			@PathVariable(value = "productId") String productId) {
-		Customer customer = custRepo.findById(curUser);
+		CustomerDTO customer = IDemoUtils.wrapInDTO(custRepo.findById(curUser),
+				CustomerDTO.class);
 		if (IUtils.isNull(customer)) {
 			logger.error("Customer details are missing.");
 			return;
 		}
 		Cart cart = null;
 		if (IUtils.isNullOrEmpty(customer.getCartId())) {
-			cart = cartRepo.save(new Cart());
-			customer.setCartId(cart.getId());
-			custRepo.save(IDemoUtils.createCopyProperties(customer, Customer.class));
+			cart = getNewCart(customer);
 		} else {
 			cart = cartRepo.findById(customer.getCartId());
+			if (IUtils.isNull(cart)) {
+				cart = getNewCart(customer);
+			}
 		}
 		Product product = productRepo.findById(productId);
 		List<String> cartItems = cart.getCartItems();
 		if (!IUtils.isNull(cartItems)) {
 			for (String key : cartItems) {
 				CartItem item = cartItemRepo.findById(key);
-				if (!IUtils.isNullOrEmpty(productId)
+				if (!IUtils.isNull(item) && !IUtils.isNullOrEmpty(productId)
 						&& productId.equals(item.getProductId())) {
 					item.setQuantity(item.getQuantity() + 1);
 					item.setTotalPrice(product.getPrice() * item.getQuantity());
@@ -109,6 +112,15 @@ public class CartResources {
 		item = cartItemRepo.save(item);
 		cart.addAnItem(item);
 		cartRepo.save(cart);
+	}
+
+	private Cart getNewCart(CustomerDTO customer) {
+		Cart cart = new Cart();
+		cart.setCustomerId(customer.getId());
+		cart = cartRepo.save(cart);
+		customer.setCartId(cart.getId());
+		custRepo.save(IDemoUtils.createCopyProperties(customer, Customer.class));
+		return cart;
 	}
 
 	@RequestMapping(value = "/remove/{cartId}/{cartItemId}", method = RequestMethod.POST)

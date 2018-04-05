@@ -12,8 +12,9 @@
 						<h1 style="text-shadow: 1px 1px 1px dodgerblue">
 							<strong>Shopping Cart </strong>
 						</h1>
-						<h3 style="text-shadow: 1px 1px 1px darkorchid">List of
-							products in your shopping cart:</h3>
+						<h3 style="text-shadow: 1px 1px 1px darkorchid">
+							List of products in your shopping cart:
+						</h3>
 					</div>
 				</div>
 			</section>
@@ -63,7 +64,7 @@
 								</td>
 								<td colspan="4"></td>
 								<td>
-									<a href="<spring:url value="/order/${cart.id}"/>" class="btn btn-success">
+									<a href="<spring:url value="/order/${cartDTO.id}"/>" class="btn btn-success">
 										Complete the Purchase
 										<span class="glyphicon glyphicon-usd"></span>
 									</a>

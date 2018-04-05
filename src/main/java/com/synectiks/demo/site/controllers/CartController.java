@@ -61,7 +61,9 @@ public class CartController {
 	}
 
 	private Cart getNewCart(CustomerDTO customer) {
-		Cart cart = cartRepo.save(new Cart());
+		Cart cart = new Cart();
+		cart.setCustomerId(customer.getId());
+		cart = cartRepo.save(cart);
 		customer.setCartId(cart.getId());
 		custRepo.save(IDemoUtils.createCopyProperties(customer, Customer.class));
 		return cart;
