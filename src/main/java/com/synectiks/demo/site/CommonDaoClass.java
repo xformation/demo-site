@@ -18,8 +18,10 @@ import com.synectiks.demo.site.dto.CartDTO;
 import com.synectiks.demo.site.dto.CustomerDTO;
 import com.synectiks.demo.site.dto.ShippingDTO;
 import com.synectiks.demo.site.repositories.BillingRepository;
+import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.CartRepository;
 import com.synectiks.demo.site.repositories.CustomerRepository;
+import com.synectiks.demo.site.repositories.ProductRepository;
 import com.synectiks.demo.site.repositories.ShippingRepository;
 import com.synectiks.demo.site.utils.IDemoUtils;
 
@@ -33,11 +35,15 @@ public class CommonDaoClass {
 	@Autowired
 	private CartRepository cartRepo;
 	@Autowired
+	private BillingRepository billRepo;
+	@Autowired
 	private CustomerRepository custRepo;
 	@Autowired
 	private ShippingRepository shipRepo;
 	@Autowired
-	private BillingRepository billRepo;
+	private ProductRepository productRepo;
+	@Autowired
+	private CartItemRepository cartItemRepo;
 
 	/**
 	 * Method to validate the cartId and fetch a cart object.
@@ -49,8 +55,10 @@ public class CommonDaoClass {
 		if (IUtils.isNullOrEmpty(cartId)) {
 			throw new SynectiksException("Null or empty cart id.");
 		}
-		Cart cart = cartRepo.findById(cartId);
-		return IDemoUtils.wrapInDTO(cart, CartDTO.class);
+		Cart c = cartRepo.findById(cartId);
+		CartDTO cart = IDemoUtils.wrapInDTO(c, CartDTO.class);
+		IDemoUtils.fillCartDto(cart, cartItemRepo, productRepo);
+		return cart;
 	}
 
 	/**

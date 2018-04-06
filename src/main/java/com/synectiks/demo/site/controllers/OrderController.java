@@ -11,6 +11,7 @@ import com.synectiks.commons.entities.demo.Cart;
 import com.synectiks.commons.entities.demo.Customer;
 import com.synectiks.commons.entities.demo.CustomerOrder;
 import com.synectiks.commons.utils.IUtils;
+import com.synectiks.demo.site.CommonDaoClass;
 import com.synectiks.demo.site.repositories.CartRepository;
 import com.synectiks.demo.site.repositories.CustomerRepository;
 import com.synectiks.demo.site.repositories.OrderRepository;
@@ -29,9 +30,12 @@ public class OrderController {
 	private CustomerRepository custRepo;
 	@Autowired
 	private OrderRepository orderRepo;
+	@Autowired
+	private CommonDaoClass daoClass;
 
 	@RequestMapping("/order/{cartId}")
 	public String createOrder(@PathVariable("cartId") String cartId) {
+		logger.info("daoClass: " + daoClass);
 		logger.info("CartId: " + cartId);
 		Cart cart = cartRepo.findById(cartId);
 		if (!IUtils.isNull(cart)) {

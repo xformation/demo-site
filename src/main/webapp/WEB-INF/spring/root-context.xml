@@ -49,4 +49,5 @@
 	<!-- commons beans -->
 	<bean id="esEventPublisher" class="com.synectiks.commons.publisher.ESEventPublisher"/>
 	<bean id="esEventReceiver" class="com.synectiks.commons.receiver.ESEventReceiver"/>
+
 </beans>

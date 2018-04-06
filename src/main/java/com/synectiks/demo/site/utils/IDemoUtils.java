@@ -12,6 +12,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 
 import com.synectiks.commons.utils.IUtils;
+import com.synectiks.demo.site.dto.CartDTO;
+import com.synectiks.demo.site.dto.CartItemDTO;
+import com.synectiks.demo.site.dto.ProductDTO;
+import com.synectiks.demo.site.repositories.CartItemRepository;
+import com.synectiks.demo.site.repositories.ProductRepository;
 
 /**
  * @author Rajesh
@@ -73,5 +78,39 @@ public interface IDemoUtils {
 		return createCopyProperties(src, cls);
 	}
 
+	/**
+	 * Method to fill cart object with items and products.
+	 * @param cart
+	 * @param cartItemRepo
+	 * @param productRepo
+	 */
+	static void fillCartDto(CartDTO cart, CartItemRepository cartItemRepo,
+			ProductRepository productRepo) {
+		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
+			for (String itemId : cart.getCartItems()) {
+				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
+						itemId), CartItemDTO.class);
+				logger.info(itemId + ": " + item);
+				setProductInCartItem(item, productRepo);
+				cart.addAnItem(item);
+			}
+		}
+	}
+
+	/**
+	 * Method to set product into cart item
+	 * @param item
+	 * @param productRepo
+	 */
+	static void setProductInCartItem(CartItemDTO item, ProductRepository productRepo) {
+		if (!IUtils.isNull(item)) {
+			ProductDTO prod = IDemoUtils.wrapInDTO(
+					productRepo.findById(item.getProductId()), ProductDTO.class);
+			logger.info("Prod: " + prod);
+			if (!IUtils.isNull(prod)) {
+				item.setProduct(prod);
+			}
+		}
+	}
 	
 }

@@ -13,9 +13,7 @@ import com.synectiks.commons.entities.demo.Cart;
 import com.synectiks.commons.entities.demo.Customer;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.demo.site.dto.CartDTO;
-import com.synectiks.demo.site.dto.CartItemDTO;
 import com.synectiks.demo.site.dto.CustomerDTO;
-import com.synectiks.demo.site.dto.ProductDTO;
 import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.CartRepository;
 import com.synectiks.demo.site.repositories.CustomerRepository;
@@ -73,20 +71,7 @@ public class CartController {
 	public String getCartRedirect(
 			@PathVariable(value = "id") String id, Model model) {
 		CartDTO cartDTO = IDemoUtils.wrapInDTO(cartRepo.findById(id), CartDTO.class);
-		if (!IUtils.isNull(cartDTO) && !IUtils.isNull(cartDTO.getCartItems())) {
-			for (String itemId : cartDTO.getCartItems()) {
-				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
-						itemId), CartItemDTO.class);
-				if (!IUtils.isNull(item)) {
-					ProductDTO prod = IDemoUtils.wrapInDTO(
-							prodRepo.findById(item.getProductId()), ProductDTO.class);
-					if (!IUtils.isNull(item)) {
-						item.setProduct(prod);
-					}
-					cartDTO.addAnItem(item);
-				}
-			}
-		}
+		IDemoUtils.fillCartDto(cartDTO, cartItemRepo, prodRepo);
 		model.addAttribute("cartDTO", cartDTO);
 		return "shoppingCart";
 	}

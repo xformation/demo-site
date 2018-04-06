@@ -105,10 +105,6 @@ public class CartDTO implements DemoDTO {
 			builder.append(builder.length() > 2 ? ", " : "");
 			builder.append("\"cartItems\": " + cartItems);
 		}
-		if (!IUtils.isNull(items)) {
-			builder.append(builder.length() > 2 ? ", " : "");
-			builder.append("\"items\": " + items);
-		}
 		if (!IUtils.isNullOrEmpty(customerId)) {
 			builder.append(builder.length() > 2 ? ", " : "");
 			builder.append("\"customerId\": \"" + customerId + "\"");

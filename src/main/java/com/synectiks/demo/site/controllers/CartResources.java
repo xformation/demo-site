@@ -1,11 +1,18 @@
 package com.synectiks.demo.site.controllers;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.synectiks.commons.entities.demo.Cart;
 import com.synectiks.commons.entities.demo.CartItem;
@@ -13,16 +20,12 @@ import com.synectiks.commons.entities.demo.Customer;
 import com.synectiks.commons.entities.demo.Product;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.demo.site.dto.CartDTO;
-import com.synectiks.demo.site.dto.CartItemDTO;
 import com.synectiks.demo.site.dto.CustomerDTO;
-import com.synectiks.demo.site.dto.ProductDTO;
 import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.CartRepository;
 import com.synectiks.demo.site.repositories.CustomerRepository;
 import com.synectiks.demo.site.repositories.ProductRepository;
 import com.synectiks.demo.site.utils.IDemoUtils;
-
-import java.util.List;
 
 /**
  * @author Rajesh
@@ -52,22 +55,7 @@ public class CartResources {
 		if (!IUtils.isNullOrEmpty(cartId)) {
 			cart = IDemoUtils.wrapInDTO(cartRepo.findById(cartId), CartDTO.class);
 		}
-		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
-			for (String itemId : cart.getCartItems()) {
-				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
-						itemId), CartItemDTO.class);
-				logger.info(itemId + ": " + item);
-				if (!IUtils.isNull(item)) {
-					ProductDTO prod = IDemoUtils.wrapInDTO(
-							productRepo.findById(item.getProductId()), ProductDTO.class);
-					logger.info("Prod: " + prod);
-					if (!IUtils.isNull(prod)) {
-						item.setProduct(prod);
-					}
-				}
-				cart.addAnItem(item);
-			}
-		}
+		IDemoUtils.fillCartDto(cart, cartItemRepo, productRepo);
 		logger.info("Returning: " + cart);
 		return cart;
 	}
