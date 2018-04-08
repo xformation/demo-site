@@ -9,6 +9,7 @@ import com.synectiks.commons.utils.IUtils;
 public class OrderDTO implements DemoDTO {
 
 	private static final long serialVersionUID = 690279501282819L;
+	public static final String ORDER_SESSION_KEY = "orderObj";
 
 	private String id;
 	private String cartId;

@@ -17,7 +17,7 @@
 		<div class="container">
 			<div class="row">
 
-				<form:form commandName="order" class="form-horizontal">
+				<form:form modelAttribute="wrapper" class="form-horizontal">
 					<div
 						class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
 						<div class="text-center">
@@ -28,12 +28,12 @@
 							<div class="col-xs-6 col-sm-6 col-md-6">
 								<address>
 									<b>Shipping information</b> <br>
-									${order.cart.shipping.street},
-									${order.cart.shipping.apartmentNumber} <br>
-									${order.cart.shipping.division},
-									${order.cart.shipping.city} <br>
-									${order.cart.shipping.country},
-									${order.cart.shipping.zip}
+									${order.shipping.street},
+									${order.shipping.apartmentNumber} <br>
+									${order.shipping.division},
+									${order.shipping.city} <br>
+									${order.shipping.country},
+									${order.shipping.zip}
 								</address>
 							</div>
 							<div class="col-xs-6 col-sm-6 col-md-6 text-right">
@@ -47,10 +47,10 @@
 							<div class="col-xs-6 col-sm-6 col-md-6">
 								<address>
 									<b>Collection Details</b> <br>
-									${order.cart.billing.cardHolder},
-									${order.cart.billing.cardNumber} <br>
-									${order.cart.billing.expiryDate},
-									${order.cart.billing.securityCode} <br>
+									${order.billing.cardHolder},
+									${order.billing.cardNumber} <br>
+									${order.billing.expiryDate},
+									${order.billing.securityCode} <br>
 								</address>
 							</div>
 						</div>
@@ -98,7 +98,7 @@
 						<%-- BACK/CANCELAR/NEXT  ===========--%>
 
 						<button class="btn btn-danger" tabindex="13" name="_eventId_cancel">Cancel</button>
-						<input type="submit" value="Completar Compra" class="btn btn-success"
+						<input type="submit" value="Complete Order" class="btn btn-success"
 							 tabindex="12" name="_eventId_orderConfirmed"> <br>
 						<button class="btn btn-default" style="margin-top: 15px;"
 							tabindex="14" name="_eventId_backToCollectShippingDetail">
@@ -109,7 +109,6 @@
 		</div>
 	</div>
 </div>
-
 
 <%@include file="/WEB-INF/views/templates/footer.jsp"%>
 

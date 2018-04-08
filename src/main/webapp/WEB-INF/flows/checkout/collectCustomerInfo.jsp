@@ -11,19 +11,19 @@
 				Buyer Data <small> (confirm that your information is correct)</small>
 			</h1>
 			<hr>
-			<form:form commandName="order" class="form ">
+			<form:form modelAttribute="wrapper" class="form">
 				<h3>User Information:</h3>
 				<div class="form-group">
 					<label for="name">First name</label>
-					<form:input path="cart.customer.name" id="name" class="form-Control" tabindex="1" />
+					<form:input path="order.customer.name" id="name" class="form-Control" tabindex="1" />
 				</div>
 				<div class="form-group">
 					<label for="email">Email</label>
-					<form:input path="cart.customer.email" id="email" class="form-control" tabindex="2" />
+					<form:input path="order.customer.email" id="email" class="form-control" tabindex="2" />
 				</div>
 				<div class="form-group">
 					<label for="phone"> Phone (10 digits) </label>
-					<form:input path="cart.customer.phone" id="phone" class="form-control" tabindex="3" />
+					<form:input path="order.customer.phone" id="phone" class="form-control" tabindex="3" />
 				</div>
 				<hr>
 				<h3 class="alert alert-warning">
@@ -31,22 +31,22 @@
 				</h3>
 				<div class="form-group">
 					<label for="cardHolder">Holder Card (credit / debit)</label>
-					<form:input path="cart.billing.cardHolder" id="cardHolder"
+					<form:input path="order.billing.cardHolder" id="cardHolder"
 							class="form-control" onkeydown="upperCaseF(this)" tabindex="4" />
 				</div>
 				<div class="form-group">
 					<label for="cardNumber">Card number </label>
-					<form:input path="cart.billing.cardNumber"
+					<form:input path="order.billing.cardNumber"
 							id="cardNumber" class="form-control" maxlength="19" tabindex="5" />
 				</div>
 				<div class="form-group">
 					<label for="expiryDate">Expiration date</label>
-					<form:input path="cart.billing.expiryDate"
+					<form:input path="order.billing.expiryDate"
 							id="expiryDate" class="form-control" maxlength="5" tabindex="6" />
 				</div>
 				<div class="form-group">
 					<label for="securityCode">Security code</label>
-					<form:input path="cart.billing.securityCode"
+					<form:input path="order.billing.securityCode"
 							id="securityCode" class="form-control" maxlength="3" tabindex="7" />
 				</div>
 				<input type="hidden" name="_flowExecutionKey" />

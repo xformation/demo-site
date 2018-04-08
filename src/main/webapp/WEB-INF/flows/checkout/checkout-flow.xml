@@ -4,24 +4,20 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow
 			http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
-	<var name="order" class="com.synectiks.demo.site.dto.OrderDTO" />
+	<var name="wrapper" class="com.synectiks.demo.site.OrderWrapper" />
 
 	<action-state id="addCartToOrder">
-		<evaluate expression="commonDaoClass.validateCart(requestParameters.id)" result="order.cart" />
-		<evaluate expression="commonDaoClass.getCustomer(order.cart)" result="order.customer"/>
-		<evaluate expression="commonDaoClass.getShipping(order.customer)" result="order.shipping"/>
-		<evaluate expression="commonDaoClass.getBilling(order.customer)" result="order.billing"/>
-		<!-- Refill cutomer object with updated items -->
-		<evaluate expression="commonDaoClass.getCustomer(order.cart)" result="order.customer"/>
+		<evaluate expression="T(com.synectiks.demo.site.controllers.OrderController).getOrder(externalContext, requestParameters.id)"
+		result="wrapper.order" />
 		<transition to="InvalidCartWarning" on-exception="com.synectiks.commons.exceptions.SynectiksException" />
 		<transition to="collectCustomerInfo" />
 	</action-state>
 
-	<view-state id="collectCustomerInfo" view="collectCustomerInfo.jsp" model="order">
+	<view-state id="collectCustomerInfo" view="collectCustomerInfo.jsp" model="wrapper">
 		<transition on="customerInfoCollected" to="collectShippingDetail" />
 	</view-state>
 
-	<view-state id="collectShippingDetail" view="collectShippingDetail.jsp" model="order">
+	<view-state id="collectShippingDetail" view="collectShippingDetail.jsp" model="wrapper">
 		<transition on="shippingDetailCollected" to="orderConfirmation" />
 		<transition on="backToCollectCustomerInfo" to="collectCustomerInfo" />
 	</view-state>
@@ -32,17 +28,18 @@
 	</view-state>
 
 	<action-state id="processOrder">
-		<evaluate expression="cartResources.clearCart(order.cartId)" />
+		<evaluate expression="T(com.synectiks.demo.site.controllers.OrderController).clearCart(externalContext, wrapper.order.cartId)" />
+		<transition to="InvalidCartWarning" on-exception="com.synectiks.commons.exceptions.SynectiksException" />
 		<transition to="thanksCustomer" />
 	</action-state>
 
-	<view-state id="thanksCustomer" model="order">
+	<view-state id="thanksCustomer" view="thanksCustomer.jsp">
 		<transition to="endState" />
 	</view-state>
 
 	<end-state id="endState" />
 
-	<view-state id="InvalidCartWarning">
+	<view-state id="InvalidCartWarning" view="invalidCartWarning.jsp" >
 		<transition to="endState" />
 	</view-state>
 

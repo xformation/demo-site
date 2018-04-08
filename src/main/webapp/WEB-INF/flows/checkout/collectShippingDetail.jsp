@@ -12,36 +12,36 @@
 				Delivery Details <small> Enter the desired location information for delivery.</ Small> 
 			</h1>
 		</div>
-		<form:form commandName="order" class="form">
+		<form:form modelAttribute="wrapper" class="form">
 			<h3>Register Delivery Information:</h3>
 
 			<div class="form-group">
 				<label for="street">Street</label>
-				<form:input path="cart.shipping.street" id="street" class="form-control" tabindex="1" />
+				<form:input path="order.shipping.street" id="street" class="form-control" tabindex="1" />
 			</div>
 			<div class="form-group">
 				<label for="division">Division</label>
-				<form:input path="cart.shipping.division" id="division" class="form-control" tabindex="2" />
+				<form:input path="order.shipping.division" id="division" class="form-control" tabindex="2" />
 			</div>
 			<div class="form-group">
 				<label for="apartmentNumber">Apartment number</label>
-				<form:input path="cart.shipping.apartmentNumber" id="apartmentNumber" class="form-control" tabindex="3" />
+				<form:input path="order.shipping.apartmentNumber" id="apartmentNumber" class="form-control" tabindex="3" />
 			</div>
 			<div class="form-group">
 				<label for="city">City</label>
-				<form:input path="cart.shipping.city" id="city" class="form-control" tabindex="4" />
+				<form:input path="order.shipping.city" id="city" class="form-control" tabindex="4" />
 			</div>
 			<div class="form-group">
 				<label for="state">State</label>
-				<form:input path="cart.shipping.state" id="state" class="form-control" tabindex="5" />
+				<form:input path="order.shipping.state" id="state" class="form-control" tabindex="5" />
 			</div>
 			<div class="form-group">
 				<label for="country">Country</label>
-				<form:input path="cart.shipping.country" id="country" class="form-control" tabindex="6" />
+				<form:input path="order.shipping.country" id="country" class="form-control" tabindex="6" />
 			</div>
 			<div class="form-group">
 				<label for="zip">Postal Code</label>
-				<form:input path="cart.shipping.zip" id="zip" class="form-control" tabindex="7" />
+				<form:input path="order.shipping.zip" id="zip" class="form-control" tabindex="7" />
 			</div>
 			<input type="hidden" name="_flowExecutionKey" />
 
@@ -50,7 +50,7 @@
 			<%-- BACK/CANCELAR/NEXT  ===========--%>
 
 			<button class="btn btn-danger" tabindex="9" name="_eventId_cancel">Cancel</button>
-			<input type="submit" value="Continuar" class="btn btn-primary"
+			<input type="submit" value="Continue" class="btn btn-primary"
 				tabindex="8" name="_eventId_shippingDetailCollected">
 			<br>
 			<button class="btn btn-default" style="margin-top: 15px;"
