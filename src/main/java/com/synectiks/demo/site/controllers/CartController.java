@@ -39,13 +39,10 @@ public class CartController {
 
 	@RequestMapping
 	public String getCart(HttpServletRequest request) {
-		CustomerDTO customer = (CustomerDTO) request.getSession()
-				.getAttribute(IDemoUtils.CUR_CUSTOMER);
+		CustomerDTO customer = IDemoUtils.validateUser(request);
 		if (IUtils.isNull(customer)) {
 			return "redirect:/login";
 		}
-		customer = IDemoUtils.wrapInDTO(custRepo.findByUsername(
-				customer.getUsername()), CustomerDTO.class);
 		Cart cart = null;
 		if (IUtils.isNullOrEmpty(customer.getCartId())) {
 			cart = getNewCart(customer);
@@ -68,8 +65,12 @@ public class CartController {
 	}
 
 	@RequestMapping("/{id}")
-	public String getCartRedirect(
+	public String getCartRedirect(HttpServletRequest request,
 			@PathVariable(value = "id") String id, Model model) {
+		CustomerDTO customer = IDemoUtils.validateUser(request);
+		if (IUtils.isNull(customer)) {
+			return "redirect:/login";
+		}
 		CartDTO cartDTO = IDemoUtils.wrapInDTO(cartRepo.findById(id), CartDTO.class);
 		IDemoUtils.fillCartDto(cartDTO, cartItemRepo, prodRepo);
 		model.addAttribute("cartDTO", cartDTO);

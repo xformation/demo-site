@@ -3,17 +3,30 @@
  */
 package com.synectiks.demo.site.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 
+import com.synectiks.commons.entities.oak.OakFileNode;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.demo.site.dto.CartDTO;
 import com.synectiks.demo.site.dto.CartItemDTO;
+import com.synectiks.demo.site.dto.CustomerDTO;
 import com.synectiks.demo.site.dto.ProductDTO;
 import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.ProductRepository;
@@ -25,11 +38,29 @@ public interface IDemoUtils {
 
 	Logger logger = LoggerFactory.getLogger(IDemoUtils.class);
 
+	String JCR_BASE_URL = "jcr.repo.server.url";
+	String JCR_LOAD_FILE = "jcr.load.file.path";
+	String JCR_CREATE_NODE = "jcr.create.node.path";
+	String JCR_REMOVE_NODE = "jcr.remove.node.path";
+
 	String CUR_CUSTOMER = "curCustomer";
+	/** /demoSite/{product_category}/prodImage/ */
+	String JCR_IMAGE_PATH = "/demo.site/%s/prodImage/";
 
 	/**
-	 * Method to load properties from source to cls object
-	 * using {@code BeanUtils#copyProperties(Object, Object)}
+	 * Method to validate and test if user is logged in.
+	 * @param request
+	 * @return
+	 */
+	static CustomerDTO validateUser(HttpServletRequest request) {
+		CustomerDTO customer = (CustomerDTO) request.getSession()
+				.getAttribute(IDemoUtils.CUR_CUSTOMER);
+		return customer;
+	}
+
+	/**
+	 * Method to load properties from source to cls object using
+	 * {@code BeanUtils#copyProperties(Object, Object)}
 	 * @param src
 	 * @param cls
 	 * @return
@@ -53,7 +84,7 @@ public interface IDemoUtils {
 	 * Method to create a DTO objects list form entity result iterator.
 	 * @param <DTO>
 	 * @param iterable
-	 * @param cls 
+	 * @param cls
 	 * @return
 	 */
 	static <DTO> List<DTO> wrapIterableInDTOList(Iterable<?> iterable, Class<DTO> cls) {
@@ -88,8 +119,8 @@ public interface IDemoUtils {
 			ProductRepository productRepo) {
 		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
 			for (String itemId : cart.getCartItems()) {
-				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(
-						itemId), CartItemDTO.class);
+				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(itemId),
+						CartItemDTO.class);
 				logger.info(itemId + ": " + item);
 				setProductInCartItem(item, productRepo);
 				cart.addAnItem(item);
@@ -112,5 +143,87 @@ public interface IDemoUtils {
 			}
 		}
 	}
-	
+
+	/**
+	 * Method to create a oak file node with nodePath and file.
+	 * @param url
+	 * @param rest
+	 * @param path
+	 * @param nodePath
+	 */
+	static void createFileNode(String url, RestTemplate rest, Path path,
+			String nodePath) {
+		if (IUtils.isNullOrEmpty(nodePath) || IUtils.isNull(path)) {
+			logger.error("File or nodePath is null or empty.");
+			return;
+		}
+		OakFileNode fileNode = OakFileNode.createNode(nodePath, path.toFile());
+		String res = IUtils.sendPostRestRequest(rest, url, null, String.class,
+				IUtils.getParamMap(nodePath, fileNode, fileNode.getName()),
+				MediaType.APPLICATION_FORM_URLENCODED);
+		logger.info("Result: " + res);
+	}
+
+	/**
+	 * Method to remove a node from jcr repository
+	 * @param apiUrl
+	 * @param rest
+	 * @param path
+	 * @param nodePath
+	 */
+	static void removeFileNode(String apiUrl, RestTemplate rest, Path path,
+			String nodePath) {
+		if (IUtils.isNullOrEmpty(nodePath) || IUtils.isNull(path)) {
+			logger.error("File or nodePath is null or empty.");
+			return;
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("absPath", nodePath + "/" + path.getFileName());
+		String res = IUtils.sendPostRestRequest(rest, apiUrl, null, String.class, map,
+				MediaType.APPLICATION_FORM_URLENCODED);
+		logger.info("Result: " + res);
+	}
+
+	/**
+	 * Method to remove a node from jcr repository
+	 * @param apiUrl
+	 * @param rest
+	 * @param nodePath
+	 * @param img
+	 */
+	static void saveImageFile(String apiUrl, RestTemplate rest, String nodePath,
+			File img) {
+		if (IUtils.isNullOrEmpty(nodePath)) {
+			logger.error("File or nodePath is null or empty.");
+			return;
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("path", nodePath);
+		String res = IUtils.sendPostRestRequest(rest, apiUrl, null, String.class, map,
+				MediaType.APPLICATION_FORM_URLENCODED);
+		logger.info("Result: " + res);
+		if (!IUtils.isNullOrEmpty(res)) {
+			try {
+				OakFileNode node = IUtils.OBJECT_MAPPER.readValue(res, OakFileNode.class);
+				if (!IUtils.isNull(node) && !IUtils.isNull(node.getData())) {
+					FileUtils.copyInputStreamToFile(node.getData(), img);
+				}
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * Method to construct create node url.
+	 * @param env
+	 * @return
+	 */
+	static String getApiUrl(Environment env, String apiKey) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(env.getProperty(JCR_BASE_URL));
+		sb.append(env.getProperty(apiKey));
+		return sb.toString();
+	}
+
 }
