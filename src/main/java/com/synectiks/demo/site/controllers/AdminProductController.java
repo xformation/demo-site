@@ -1,6 +1,5 @@
 package com.synectiks.demo.site.controllers;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,12 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -60,12 +58,21 @@ public class AdminProductController {
 	}
 
 	private Path path;
-	@Autowired
-	private Environment env;
+	private String ctxPath;
+	private String rootPath;
+
 	@Autowired
 	private RestTemplate rest;
 	@Autowired
 	private ProductRepository prodRepo;
+	@Value("${" + IDemoUtils.JCR_BASE_URL + "}")
+	private String baseUrl;
+	@Value("${" + IDemoUtils.JCR_CREATE_NODE + "}")
+	private String createNode;
+	@Value("${" + IDemoUtils.JCR_REMOVE_NODE + "}")
+	private String removeNode;
+	@Value("${" + IDemoUtils.JCR_UPLOAD_FILE + "}")
+	private String uploadFile;
 
 	@RequestMapping("/inventory/add")
 	public ModelAndView addProduct(HttpServletRequest request, ModelMap model) {
@@ -73,6 +80,8 @@ public class AdminProductController {
 		if (IUtils.isNull(customer)) {
 			return new ModelAndView("login");
 		}
+		ctxPath = request.getContextPath();
+		rootPath = request.getSession().getServletContext().getRealPath("/");
 		ProductDTO product = new ProductDTO();
 		product.setCondition("New");
 		model.addAttribute("categoryList", categories);
@@ -82,25 +91,21 @@ public class AdminProductController {
 	}
 
 	@RequestMapping(value = "/inventory/add", method = RequestMethod.POST)
-	public String addProductPost(@Valid @ModelAttribute("productDTO") ProductDTO productDTO,
-			BindingResult result, HttpServletRequest request, ModelMap model) {
-		CustomerDTO customer = IDemoUtils.validateUser(request);
-		if (IUtils.isNull(customer)) {
-			return "redirect:/login";
-		}
-		logger.info("Obj: " + productDTO + "\n" + model);
+	public String addProductPost(@ModelAttribute("productDTO") ProductDTO dto,
+			BindingResult result, ModelMap model) {
+		logger.info("Obj: " + dto + "\n" + model);
 		model.addAttribute("categoryList", categories);
 		if (result.hasErrors()) {
 			return "redirect:/admin/inventory/add";
 		}
-		if (!IUtils.isNull(productDTO)) {
-			if (IUtils.isNullOrEmpty(productDTO.getName()))
+		if (!IUtils.isNull(dto)) {
+			if (IUtils.isNullOrEmpty(dto.getName()))
 				result.addError(new FieldError("productDTO", "name",
 						"Product name is null."));
-			if (IUtils.isNullOrEmpty(productDTO.getManufacturer()))
+			if (IUtils.isNullOrEmpty(dto.getManufacturer()))
 				result.addError(new FieldError("productDTO", "manufacturer",
 						"Product manufacturer is null."));
-			if (productDTO.getPrice() <= 0)
+			if (dto.getPrice() <= 0)
 				result.addError(new FieldError("productDTO", "price",
 						"Product price must be > 0"));
 
@@ -108,23 +113,24 @@ public class AdminProductController {
 				return "redirect:/admin/inventory/add";
 			}
 		}
-		MultipartFile image = productDTO.getImage();
-		Product entity = IDemoUtils.createCopyProperties(productDTO, Product.class);
+		MultipartFile image = dto.getImage();
+		Product entity = IDemoUtils.createCopyProperties(dto, Product.class);
 		entity = prodRepo.save(entity);
-		productDTO = IDemoUtils.createCopyProperties(entity, ProductDTO.class);
-		logger.info("Product: " + productDTO.getId());
-		String root_directory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(root_directory + "/resources/product_images/"
-				+ productDTO.getId() + ".png");
+		dto = IDemoUtils.createCopyProperties(entity, ProductDTO.class);
+		logger.info("Product: " + dto.getId());
+		path = Paths.get(rootPath + IDemoUtils.RES_PROD_IMG_PATH
+				+ dto.getId() + ".png");
 		logger.info("image path: " + path);
 		if (image != null && !image.isEmpty()) {
 			try {
-				image.transferTo(new File(path.toString()));
+				image.transferTo(path.toFile());
 				// Save image into jcr repository
 				String nodePath = String.format(
-						IDemoUtils.JCR_IMAGE_PATH, productDTO.getCategory());
+						IDemoUtils.JCR_IMAGE_PATH, ctxPath, dto.getCategory());
+				String upFilePath = IDemoUtils.uploadFile(IDemoUtils.getApiUrl(
+						baseUrl, uploadFile), path.toFile(), nodePath);
 				IDemoUtils.createFileNode(IDemoUtils.getApiUrl(
-						env, IDemoUtils.JCR_CREATE_NODE), rest, path, nodePath);
+						baseUrl, createNode), rest, path, nodePath, upFilePath);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("The product image could not be saved.", e);
@@ -140,6 +146,8 @@ public class AdminProductController {
 		if (IUtils.isNull(customer)) {
 			return "redirect:/login";
 		}
+		ctxPath = request.getContextPath();
+		rootPath = request.getSession().getServletContext().getRealPath("/");
 		ProductDTO productDTO = IDemoUtils.wrapInDTO(
 				prodRepo.findById(id), ProductDTO.class);
 		model.addAttribute("categoryList", categories);
@@ -149,35 +157,34 @@ public class AdminProductController {
 	}
 
 	@RequestMapping(value = "/inventory/edit", method = RequestMethod.POST)
-	public String editProductPost(@ModelAttribute("productDTO") ProductDTO productDTO,
-			BindingResult result, Model model, HttpServletRequest request)
-			throws RuntimeException {
-		CustomerDTO customer = IDemoUtils.validateUser(request);
-		if (IUtils.isNull(customer)) {
-			return "redirect:/login";
-		}
+	public String editProductPost(@ModelAttribute("productDTO") ProductDTO dto,
+			BindingResult result, Model model) throws RuntimeException {
 		model.addAttribute("categoryList", categories);
 		if (result.hasErrors()) {
 			return "editProduct";
 		}
-		MultipartFile image = productDTO.getImage();
-		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(rootDirectory + "/resources/product_images/"
-				+ productDTO.getId() + ".png");
+		MultipartFile image = dto.getImage();
+		path = Paths.get(rootPath + IDemoUtils.RES_PROD_IMG_PATH
+				+ dto.getId() + ".png");
 
 		if (image != null && !image.isEmpty()) {
 			try {
-				image.transferTo(new File(path.toString()));
+				image.transferTo(path.toFile());
 				// Save image into jcr repository
 				String nodePath = String.format(
-						IDemoUtils.JCR_IMAGE_PATH, productDTO.getCategory());
+						IDemoUtils.JCR_IMAGE_PATH, ctxPath, dto.getCategory());
+				logger.info("NodePath: " + nodePath);
+				String upFilePath = IDemoUtils.uploadFile(IDemoUtils.getApiUrl(
+						baseUrl, uploadFile), path.toFile(), nodePath);
+				upFilePath = upFilePath.replaceAll("\\\\", "/");
+				logger.info("uploaded file path: " + upFilePath);
 				IDemoUtils.createFileNode(IDemoUtils.getApiUrl(
-						env, IDemoUtils.JCR_CREATE_NODE), rest, path, nodePath);
+						baseUrl, createNode), rest, path, nodePath, upFilePath);
 			} catch (Exception e) {
-				throw new RuntimeException("The product image could not be saved." + e);
+				throw new RuntimeException("The product image could not be saved.", e);
 			}
 		}
-		prodRepo.save(IDemoUtils.createCopyProperties(productDTO, Product.class));
+		prodRepo.save(IDemoUtils.createCopyProperties(dto, Product.class));
 
 		return "redirect:/admin/inventory";
 	}
@@ -189,9 +196,9 @@ public class AdminProductController {
 		if (IUtils.isNull(customer)) {
 			return "redirect:/login";
 		}
-		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
-		path = Paths.get(rootDirectory + "/resources/product_images/"
-				+ id + ".png");
+		ctxPath = request.getContextPath();
+		rootPath = request.getSession().getServletContext().getRealPath("/");
+		path = Paths.get(rootPath + IDemoUtils.RES_PROD_IMG_PATH + id + ".png");
 		if (Files.exists(path)) {
 			try {
 				Files.delete(path);
@@ -200,7 +207,7 @@ public class AdminProductController {
 				String nodePath = String.format(
 						IDemoUtils.JCR_IMAGE_PATH, prod.getCategory());
 				IDemoUtils.removeFileNode(IDemoUtils.getApiUrl(
-						env, IDemoUtils.JCR_REMOVE_NODE), rest, path, nodePath);
+						baseUrl, removeNode), rest, path, nodePath);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}

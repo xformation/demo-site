@@ -7,9 +7,6 @@
 			http://www.springframework.org/schema/webflow-config
 			http://www.springframework.org/schema/webflow-config/spring-webflow-config.xsd">
 
-	<!-- Create rest template bean -->
-	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
-
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<bean id="demoProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:demo.properties" />
@@ -19,6 +16,9 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="maxUploadSize" value="${file.upload.max.size}"/>
 	</bean>
+
+	<!-- Create rest template bean -->
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
 
 	<!-- Work-flow configuration for order handling -->
 	<webflow-config:flow-executor id="flowExecutor" flow-registry="flowRegistry" />

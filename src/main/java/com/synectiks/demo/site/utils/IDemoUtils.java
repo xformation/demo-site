@@ -42,10 +42,12 @@ public interface IDemoUtils {
 	String JCR_LOAD_FILE = "jcr.load.file.path";
 	String JCR_CREATE_NODE = "jcr.create.node.path";
 	String JCR_REMOVE_NODE = "jcr.remove.node.path";
+	String JCR_UPLOAD_FILE = "jcr.upload.file";
 
 	String CUR_CUSTOMER = "curCustomer";
-	/** /demoSite/{product_category}/prodImage/ */
-	String JCR_IMAGE_PATH = "/demo.site/%s/prodImage/";
+	String RES_PROD_IMG_PATH = "resources/product_images/";
+	/** /{context_path}/{product_category}/prodImage */
+	String JCR_IMAGE_PATH = "%s/%s/prodImage";
 
 	/**
 	 * Method to validate and test if user is logged in.
@@ -150,14 +152,16 @@ public interface IDemoUtils {
 	 * @param rest
 	 * @param path
 	 * @param nodePath
+	 * @param upFilePath 
 	 */
 	static void createFileNode(String url, RestTemplate rest, Path path,
-			String nodePath) {
+			String nodePath, String upFilePath) {
 		if (IUtils.isNullOrEmpty(nodePath) || IUtils.isNull(path)) {
 			logger.error("File or nodePath is null or empty.");
 			return;
 		}
 		OakFileNode fileNode = OakFileNode.createNode(nodePath, path.toFile());
+		fileNode.setPath(upFilePath);
 		String res = IUtils.sendPostRestRequest(rest, url, null, String.class,
 				IUtils.getParamMap(nodePath, fileNode, fileNode.getName()),
 				MediaType.APPLICATION_FORM_URLENCODED);
@@ -217,13 +221,56 @@ public interface IDemoUtils {
 	/**
 	 * Method to construct create node url.
 	 * @param env
+	 * @param apiKey
 	 * @return
 	 */
 	static String getApiUrl(Environment env, String apiKey) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(env.getProperty(JCR_BASE_URL));
-		sb.append(env.getProperty(apiKey));
+		String val = env.getProperty(JCR_BASE_URL);
+		sb.append(IUtils.isNullOrEmpty(val) ? "" : val);
+		val = env.getProperty(apiKey);
+		sb.append(IUtils.isNullOrEmpty(val) ? "" : val);
 		return sb.toString();
+	}
+
+	/**
+	 * Method to construct create node url.
+	 * @param baseUrl
+	 * @param apiPath
+	 * @return
+	 */
+	static String getApiUrl(String baseUrl, String apiPath) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(IUtils.isNullOrEmpty(baseUrl) ? "" : baseUrl);
+		sb.append(IUtils.isNullOrEmpty(apiPath) ? "" : apiPath);
+		IUtils.logger.info("Url: " + sb.toString());
+		return sb.toString();
+	}
+
+	/**
+	 * Method to upload file on jcr service server
+	 * @param url 
+	 * @param file
+	 * @param nodePath 
+	 * @return
+	 */
+	static String uploadFile(String url, File file, String nodePath) {
+		if (IUtils.isNullOrEmpty(url) || (!IUtils.isNull(file) && !file.exists())) {
+			logger.error("File or url is null or empty.");
+			return null;
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("upPath", nodePath);
+		Map<String, File> files = new HashMap<>();
+		files.put("file", file);
+		String res = null;
+		try {
+			res = IUtils.sendMultiPartPostReq(url, map, files);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		logger.info("Result: " + res);
+		return res;
 	}
 
 }

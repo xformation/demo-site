@@ -7,7 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +26,16 @@ import com.synectiks.demo.site.utils.IDemoUtils;
 @RequestMapping("/products")
 public class ProductController {
 
-	@Autowired
-	private Environment env;
+	private String ctxPath;
 	@Autowired
 	private RestTemplate rest;
 	@Autowired
 	private ProductRepository productRepo;
+
+	@Value("${" + IDemoUtils.JCR_BASE_URL + "}")
+	private String baseUrl;
+	@Value("${" + IDemoUtils.JCR_LOAD_FILE + "}")
+	private String loadNode;
 
 	@RequestMapping
 	public String getProducts(Model model) {
@@ -44,6 +48,7 @@ public class ProductController {
 	public String detallesProduct(@PathVariable String productId,
 			HttpServletRequest request, Model model)
 			throws IOException {
+		ctxPath = request.getContextPath();
 		Product product = productRepo.findById(productId);
 		model.addAttribute(product);
 		String path = request.getServletContext().getRealPath("/");
@@ -62,9 +67,9 @@ public class ProductController {
 		String fileName = name + ".png";
 		File img = new File(path, fileName );
 		if (!IUtils.isNull(img) && !img.exists()) {
-			String url = IDemoUtils.getApiUrl(env, IDemoUtils.JCR_LOAD_FILE);
+			String url = IDemoUtils.getApiUrl(baseUrl, loadNode);
 			String nodePath = String.format(
-					IDemoUtils.JCR_IMAGE_PATH, category) + fileName;
+					IDemoUtils.JCR_IMAGE_PATH, ctxPath, category) + "/" + fileName;
 			IDemoUtils.saveImageFile(url, rest, nodePath, img);
 		}
 	}
