@@ -5,6 +5,7 @@ package com.synectiks.demo.site.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public interface IDemoUtils {
 	Logger logger = LoggerFactory.getLogger(IDemoUtils.class);
 
 	String JCR_BASE_URL = "jcr.repo.server.url";
+	String JCR_DOWNLOAD_FILE = "jcr.download.file";
 	String JCR_LOAD_FILE = "jcr.load.file.path";
 	String JCR_CREATE_NODE = "jcr.create.node.path";
 	String JCR_REMOVE_NODE = "jcr.remove.node.path";
@@ -46,7 +48,7 @@ public interface IDemoUtils {
 
 	String CUR_CUSTOMER = "curCustomer";
 	String RES_PROD_IMG_PATH = "resources/product_images/";
-	/** /{context_path}/{product_category}/prodImage */
+	/** {context_path}/{product_category}/prodImage */
 	String JCR_IMAGE_PATH = "%s/%s/prodImage";
 
 	/**
@@ -183,13 +185,40 @@ public interface IDemoUtils {
 		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("absPath", nodePath + "/" + path.getFileName());
-		String res = IUtils.sendPostRestRequest(rest, apiUrl, null, String.class, map,
-				MediaType.APPLICATION_FORM_URLENCODED);
+		String res = IUtils.sendPostRestRequest(rest, apiUrl,
+				 null, String.class, map, MediaType.APPLICATION_FORM_URLENCODED);
 		logger.info("Result: " + res);
 	}
 
 	/**
-	 * Method to remove a node from jcr repository
+	 * Method to save a node as file from jcr repository
+	 * @param apiUrl
+	 * @param rest
+	 * @param nodePath
+	 * @param img
+	 */
+	static void saveImage(String apiUrl, String nodePath, File img) {
+		if (IUtils.isNullOrEmpty(nodePath)) {
+			logger.error("File or nodePath is null or empty.");
+			return;
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("path", nodePath);
+		try {
+			InputStream is = IUtils.getStreamFromPostReq(apiUrl, map);
+			logger.info("Result: " + is);
+			if (!IUtils.isNull(is)) {
+				FileUtils.copyInputStreamToFile(is, img);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Method to save a node string into file from jcr repository
 	 * @param apiUrl
 	 * @param rest
 	 * @param nodePath
@@ -208,7 +237,8 @@ public interface IDemoUtils {
 		logger.info("Result: " + res);
 		if (!IUtils.isNullOrEmpty(res)) {
 			try {
-				OakFileNode node = IUtils.OBJECT_MAPPER.readValue(res, OakFileNode.class);
+				//OakFileNode node = IUtils.OBJECT_MAPPER.readValue(res, OakFileNode.class);
+				OakFileNode node = IUtils.createOakFileNode(res, img.getName());
 				if (!IUtils.isNull(node) && !IUtils.isNull(node.getData())) {
 					FileUtils.copyInputStreamToFile(node.getData(), img);
 				}
@@ -271,6 +301,26 @@ public interface IDemoUtils {
 		}
 		logger.info("Result: " + res);
 		return res;
+	}
+
+	/**
+	 * Method to remove all non numeric chars from node path
+	 * @param input
+	 * @return
+	 */
+	static String removeNonAlphaNumericChars(String input) {
+		if (IUtils.isNullOrEmpty(input)) {
+			return null;
+		}
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < input.length(); i++) {
+			char tmpChar = input.charAt(i);
+			if (Character.isLetterOrDigit(tmpChar) ||
+					tmpChar == '_' || tmpChar == '/' || tmpChar == '.') {
+				result.append(tmpChar);
+			}
+		}
+		return result.toString();
 	}
 
 }

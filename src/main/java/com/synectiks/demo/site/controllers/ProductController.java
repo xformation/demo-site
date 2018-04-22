@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.client.RestTemplate;
 
 import com.synectiks.commons.entities.demo.Product;
 import com.synectiks.commons.utils.IUtils;
@@ -28,14 +27,12 @@ public class ProductController {
 
 	private String ctxPath;
 	@Autowired
-	private RestTemplate rest;
-	@Autowired
 	private ProductRepository productRepo;
 
 	@Value("${" + IDemoUtils.JCR_BASE_URL + "}")
 	private String baseUrl;
-	@Value("${" + IDemoUtils.JCR_LOAD_FILE + "}")
-	private String loadNode;
+	@Value("${" + IDemoUtils.JCR_DOWNLOAD_FILE + "}")
+	private String downloadFile;
 
 	@RequestMapping
 	public String getProducts(Model model) {
@@ -67,10 +64,12 @@ public class ProductController {
 		String fileName = name + ".png";
 		File img = new File(path, fileName );
 		if (!IUtils.isNull(img) && !img.exists()) {
-			String url = IDemoUtils.getApiUrl(baseUrl, loadNode);
-			String nodePath = String.format(
-					IDemoUtils.JCR_IMAGE_PATH, ctxPath, category) + "/" + fileName;
-			IDemoUtils.saveImageFile(url, rest, nodePath, img);
+			String url = IDemoUtils.getApiUrl(baseUrl, downloadFile);
+			String nodePath = String.format(IDemoUtils.JCR_IMAGE_PATH,
+					ctxPath, category);
+			nodePath = IDemoUtils.removeNonAlphaNumericChars(nodePath);
+			nodePath += "/" + fileName;
+			IDemoUtils.saveImage(url, nodePath, img);
 		}
 	}
 }

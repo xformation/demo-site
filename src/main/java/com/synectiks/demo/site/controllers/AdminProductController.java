@@ -125,10 +125,12 @@ public class AdminProductController {
 			try {
 				image.transferTo(path.toFile());
 				// Save image into jcr repository
-				String nodePath = String.format(
-						IDemoUtils.JCR_IMAGE_PATH, ctxPath, dto.getCategory());
+				String nodePath = String.format(IDemoUtils.JCR_IMAGE_PATH,
+						ctxPath, dto.getCategory());
+				nodePath = IDemoUtils.removeNonAlphaNumericChars(nodePath);
 				String upFilePath = IDemoUtils.uploadFile(IDemoUtils.getApiUrl(
 						baseUrl, uploadFile), path.toFile(), nodePath);
+				upFilePath = upFilePath.replaceAll("\\\\", "/");
 				IDemoUtils.createFileNode(IDemoUtils.getApiUrl(
 						baseUrl, createNode), rest, path, nodePath, upFilePath);
 			} catch (Exception e) {
@@ -173,6 +175,7 @@ public class AdminProductController {
 				// Save image into jcr repository
 				String nodePath = String.format(
 						IDemoUtils.JCR_IMAGE_PATH, ctxPath, dto.getCategory());
+				nodePath = IDemoUtils.removeNonAlphaNumericChars(nodePath);
 				logger.info("NodePath: " + nodePath);
 				String upFilePath = IDemoUtils.uploadFile(IDemoUtils.getApiUrl(
 						baseUrl, uploadFile), path.toFile(), nodePath);
@@ -206,6 +209,7 @@ public class AdminProductController {
 				// Save image into jcr repository
 				String nodePath = String.format(
 						IDemoUtils.JCR_IMAGE_PATH, prod.getCategory());
+				nodePath = IDemoUtils.removeNonAlphaNumericChars(nodePath);
 				IDemoUtils.removeFileNode(IDemoUtils.getApiUrl(
 						baseUrl, removeNode), rest, path, nodePath);
 			} catch (Exception e) {
