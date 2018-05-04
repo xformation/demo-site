@@ -23,14 +23,28 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import com.synectiks.commons.entities.demo.BillingAddress;
+import com.synectiks.commons.entities.demo.Cart;
+import com.synectiks.commons.entities.demo.CartItem;
+import com.synectiks.commons.entities.demo.Customer;
+import com.synectiks.commons.entities.demo.Product;
+import com.synectiks.commons.entities.demo.ShippingAddress;
 import com.synectiks.commons.entities.oak.OakFileNode;
+import com.synectiks.commons.exceptions.SynectiksException;
 import com.synectiks.commons.utils.IUtils;
+import com.synectiks.demo.site.dto.BillingDTO;
 import com.synectiks.demo.site.dto.CartDTO;
 import com.synectiks.demo.site.dto.CartItemDTO;
 import com.synectiks.demo.site.dto.CustomerDTO;
+import com.synectiks.demo.site.dto.OrderDTO;
 import com.synectiks.demo.site.dto.ProductDTO;
+import com.synectiks.demo.site.dto.ShippingDTO;
+import com.synectiks.demo.site.repositories.BillingRepository;
 import com.synectiks.demo.site.repositories.CartItemRepository;
+import com.synectiks.demo.site.repositories.CartRepository;
+import com.synectiks.demo.site.repositories.CustomerRepository;
 import com.synectiks.demo.site.repositories.ProductRepository;
+import com.synectiks.demo.site.repositories.ShippingRepository;
 
 /**
  * @author Rajesh
@@ -126,8 +140,10 @@ public interface IDemoUtils {
 				CartItemDTO item = IDemoUtils.wrapInDTO(cartItemRepo.findById(itemId),
 						CartItemDTO.class);
 				logger.info(itemId + ": " + item);
-				setProductInCartItem(item, productRepo);
-				cart.addAnItem(item);
+				if (!IUtils.isNull(item)) {
+					setProductInCartItem(item, productRepo);
+					cart.addAnItem(item);
+				}
 			}
 		}
 	}
@@ -138,7 +154,7 @@ public interface IDemoUtils {
 	 * @param productRepo
 	 */
 	static void setProductInCartItem(CartItemDTO item, ProductRepository productRepo) {
-		if (!IUtils.isNull(item)) {
+		if (!IUtils.isNull(item) && !IUtils.isNullOrEmpty(item.getProductId())) {
 			ProductDTO prod = IDemoUtils.wrapInDTO(
 					productRepo.findById(item.getProductId()), ProductDTO.class);
 			logger.info("Prod: " + prod);
@@ -146,6 +162,166 @@ public interface IDemoUtils {
 				item.setProduct(prod);
 			}
 		}
+	}
+
+	/**
+	 * Method to remove (update status as removed) the finished cart from db.
+	 * @param cartRepo
+	 * @param cartItemRepo
+	 * @param productRepo
+	 * @param custRepo
+	 * @param billRepo
+	 * @param shipRepo
+	 * @param cartId
+	 */
+	static void clearOrder(CartRepository cartRepo, CartItemRepository cartItemRepo,
+			ProductRepository productRepo, CustomerRepository custRepo,
+			BillingRepository billRepo, ShippingRepository shipRepo, String cartId) {
+		if (IUtils.isNull(cartId)) {
+			logger.info("Invalid cart id: " + cartId);
+		} else {
+			Cart cart = cartRepo.findById(cartId);
+			if (!IUtils.isNull(cart)) {
+				for (String itemId : cart.getCartItems()) {
+					CartItem cItem = cartItemRepo.findById(itemId);
+					if (!IUtils.isNull(cItem) && !IUtils.isNullOrEmpty(cItem.getProductId())) {
+						Product prod = productRepo.findById(cItem.getProductId());
+						// Update items quantity
+						prod.setStockCount(prod.getStockCount() - cItem.getQuantity());
+						productRepo.save(prod);
+					}
+					cItem.setState("SOLD");
+					cartItemRepo.save(cItem);
+				}
+				Customer cust = custRepo.findById(cart.getCustomerId());
+				cust.setCartId(null);
+				custRepo.save(cust);
+			}
+		}
+	}
+
+	/**
+	 * Load an order by cartid
+	 * @param cartId
+	 * @return
+	 */
+	static OrderDTO getOrder(CartRepository cartRepo, CartItemRepository cartItemRepo,
+			ProductRepository productRepo, CustomerRepository custRepo,
+			BillingRepository billRepo, ShippingRepository shipRepo, String cartId) {
+		OrderDTO order = null;
+		if (IUtils.isNull(cartId)) {
+			logger.info("Invalid cart id: " + cartId);
+		} else {
+			try {
+				order = new OrderDTO();
+				// Set cart
+				CartDTO cart = IDemoUtils.wrapInDTO(
+						cartRepo.findById(cartId), CartDTO.class);
+				fillCartDto(cart, cartItemRepo, productRepo);
+				order.setCartId(cart.getId());
+				order.setCart(cart);
+				// Set customer
+				CustomerDTO customer = getCustomer(custRepo, cart);
+				logger.info("Found customer: " + customer);
+				order.setCustomerId(customer.getId());
+				order.setCustomer(customer);
+				// Set Billing
+				BillingDTO billing = getBilling(custRepo, billRepo, customer);
+				order.setBillingId(billing.getId());
+				order.setBilling(billing);
+				// Set Shipping
+				ShippingDTO shipping = getShipping(custRepo, shipRepo, customer);
+				order.setShippingId(shipping.getId());
+				order.setShipping(shipping);
+				logger.info("Order object is filled");
+			} catch (SynectiksException se) {
+				logger.error("Failed to collect order info", se);
+			}
+		}
+		return order;
+	}
+
+	/**
+	 * Method to fetch customer from cart object.
+	 * @param custRepo 
+	 * @param cart
+	 * @return
+	 * @throws SynectiksException
+	 */
+	static CustomerDTO getCustomer(CustomerRepository custRepo, CartDTO cart)
+			throws SynectiksException {
+		if (IUtils.isNull(cart) || IUtils.isNullOrEmpty(cart.getCustomerId())) {
+			throw new SynectiksException("Invalid/Null cart object.");
+		}
+		if (IUtils.isNull(custRepo)) {
+			logger.info("Customer repository is null");
+		}
+		return IDemoUtils.wrapInDTO(
+				custRepo.findById(cart.getCustomerId()), CustomerDTO.class);
+	}
+
+	/**
+	 * Method to fetch or create shipping object for customer.
+	 * @param custRepo 
+	 * @param shipRepo 
+	 * @param customer
+	 * @return
+	 * @throws SynectiksException
+	 */
+	static ShippingDTO getShipping(CustomerRepository custRepo, ShippingRepository shipRepo,
+			CustomerDTO customer) throws SynectiksException {
+		if (IUtils.isNull(customer)) {
+			throw new SynectiksException("Invalid/Null cart object.");
+		}
+		logger.info("Fetching shipping address: " + customer.getShippingId());
+		if (IUtils.isNull(shipRepo)) {
+			logger.info("Shipping repository is null");
+		}
+		ShippingDTO shipping = null;
+		if (!IUtils.isNullOrEmpty(customer.getShippingId())) {
+			shipping = IDemoUtils.wrapInDTO(
+					shipRepo.findById(customer.getShippingId()), ShippingDTO.class);
+			logger.info("Found shipping: " + shipping);
+		} else {
+			shipping = IDemoUtils.wrapInDTO(
+					shipRepo.save(new ShippingAddress()), ShippingDTO.class);
+			customer.setShippingId(shipping.getId());
+			custRepo.save(IDemoUtils.wrapInDTO(customer, Customer.class));
+			logger.info("New shipping created: " + shipping.getId());
+		}
+		return shipping;
+	}
+
+	/**
+	 * Method to fetch or create shipping object for customer.
+	 * @param custRepo 
+	 * @param billRepo 
+	 * @param customer
+	 * @return
+	 * @throws SynectiksException
+	 */
+	static BillingDTO getBilling(CustomerRepository custRepo, BillingRepository billRepo,
+			CustomerDTO customer) throws SynectiksException {
+		if (IUtils.isNull(customer)) {
+			throw new SynectiksException("Invalid/Null cart object.");
+		}
+		logger.info("Fetching billing address: " + customer.getShippingId());
+		if (IUtils.isNull(billRepo)) {
+			logger.info("Billing repository is null");
+		}
+		BillingDTO billing = null;
+		if (!IUtils.isNullOrEmpty(customer.getBillingId())) {
+			billing = IDemoUtils.wrapInDTO(
+					billRepo.findById(customer.getBillingId()), BillingDTO.class);
+			logger.info("Found billing: " + billing);
+		} else {
+			billing = IDemoUtils.wrapInDTO(
+					billRepo.save(new BillingAddress()), BillingDTO.class);
+			customer.setBillingId(billing.getId());
+			custRepo.save(IDemoUtils.wrapInDTO(customer, Customer.class));
+			logger.info("new billing created: " + billing.getId());
+		}
+		return billing;
 	}
 
 	/**

@@ -64,7 +64,7 @@
 								</td>
 								<td colspan="4"></td>
 								<td>
-									<a href="<spring:url value="/order/${cartDTO.id}"/>" class="btn btn-success">
+									<a href="<spring:url value="/shopping/id/${cartDTO.id}"/>" class="btn btn-success">
 										Complete the Purchase
 										<span class="glyphicon glyphicon-usd"></span>
 									</a>

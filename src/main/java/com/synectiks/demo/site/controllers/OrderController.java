@@ -10,18 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.webflow.context.ExternalContext;
 
-import com.synectiks.commons.entities.demo.BillingAddress;
 import com.synectiks.commons.entities.demo.Cart;
 import com.synectiks.commons.entities.demo.Customer;
 import com.synectiks.commons.entities.demo.CustomerOrder;
-import com.synectiks.commons.entities.demo.ShippingAddress;
 import com.synectiks.commons.exceptions.SynectiksException;
 import com.synectiks.commons.utils.IUtils;
-import com.synectiks.demo.site.dto.BillingDTO;
-import com.synectiks.demo.site.dto.CartDTO;
-import com.synectiks.demo.site.dto.CustomerDTO;
 import com.synectiks.demo.site.dto.OrderDTO;
-import com.synectiks.demo.site.dto.ShippingDTO;
 import com.synectiks.demo.site.repositories.BillingRepository;
 import com.synectiks.demo.site.repositories.CartItemRepository;
 import com.synectiks.demo.site.repositories.CartRepository;
@@ -68,123 +62,15 @@ public class OrderController {
 			Customer customer = custRepo.findById(cart.getCustomerId());
 			customerOrder.setCustomerId(customer.getId());
 			customerOrder.setBillingId(customer.getBillingId());
-			customer.setShippingId(customer.getShippingId());
+			customerOrder.setShippingId(customer.getShippingId());
 
 			orderRepo.save(customerOrder);
 			// set order into session
 			request.getSession().setAttribute(
-					OrderDTO.ORDER_SESSION_KEY, getOrder(cartId));
+					OrderDTO.ORDER_SESSION_KEY, IDemoUtils.getOrder(cartRepo, cartItemRepo,
+							productRepo, custRepo, billRepo, shipRepo, cartId));
 		}
 		return "redirect:/checkout?id=" + cartId;
-	}
-
-	/**
-	 * Load an order by cartid
-	 * @param cartId
-	 * @return
-	 */
-	public OrderDTO getOrder(String cartId) {
-		OrderDTO order = null;
-		if (IUtils.isNull(cartId)) {
-			logger.info("Invalid cart id: " + cartId);
-		} else {
-			try {
-				order = new OrderDTO();
-				// Set cart
-				CartDTO cart = IDemoUtils.wrapInDTO(
-						cartRepo.findById(cartId), CartDTO.class);
-				IDemoUtils.fillCartDto(cart, cartItemRepo, productRepo);
-				order.setCartId(cart.getId());
-				order.setCart(cart);
-				// Set customer
-				CustomerDTO customer = getCustomer(cart);
-				order.setCustomerId(customer.getId());
-				order.setCustomer(customer);
-				// Set Billing
-				BillingDTO billing = getBilling(customer);
-				order.setBillingId(billing.getId());
-				order.setBilling(billing);
-				// Set Shipping
-				ShippingDTO shipping = getShipping(customer);
-				order.setShippingId(shipping.getId());
-				order.setShipping(shipping);
-				logger.info("Order object is filled");
-			} catch (SynectiksException se) {
-				logger.error("Failed to collect order info", se);
-			}
-		}
-		return order;
-	}
-
-	/**
-	 * Method to fetch customer from cart object.
-	 * @param cart
-	 * @return
-	 * @throws SynectiksException
-	 */
-	public CustomerDTO getCustomer(CartDTO cart) throws SynectiksException {
-		if (IUtils.isNull(cart) || IUtils.isNullOrEmpty(cart.getCustomerId())) {
-			throw new SynectiksException("Invalid/Null cart object.");
-		}
-		if (IUtils.isNull(custRepo)) {
-			logger.info("Customer repository is null");
-		}
-		return IDemoUtils.wrapInDTO(
-				custRepo.findById(cart.getCustomerId()), CustomerDTO.class);
-	}
-
-	/**
-	 * Method to fetch or create shipping object for customer.
-	 * @param customer
-	 * @return
-	 * @throws SynectiksException
-	 */
-	public ShippingDTO getShipping(CustomerDTO customer) throws SynectiksException {
-		if (IUtils.isNull(customer)) {
-			throw new SynectiksException("Invalid/Null cart object.");
-		}
-		logger.info("Fetching shipping address: " + customer.getShippingId());
-		if (IUtils.isNull(shipRepo)) {
-			logger.info("Shipping repository is null");
-		}
-		ShippingDTO shipping = null;
-		if (!IUtils.isNullOrEmpty(customer.getShippingId())) {
-			shipping = IDemoUtils.wrapInDTO(
-					shipRepo.findById(customer.getShippingId()), ShippingDTO.class);
-		} else {
-			shipping = IDemoUtils.wrapInDTO(
-					shipRepo.save(new ShippingAddress()), ShippingDTO.class);
-			customer.setShippingId(shipping.getId());
-			custRepo.save(IDemoUtils.wrapInDTO(customer, Customer.class));
-		}
-		return shipping;
-	}
-
-	/**
-	 * Method to fetch or create shipping object for customer.
-	 * @param customer
-	 * @return
-	 * @throws SynectiksException
-	 */
-	public BillingDTO getBilling(CustomerDTO customer) throws SynectiksException {
-		if (IUtils.isNull(customer)) {
-			throw new SynectiksException("Invalid/Null cart object.");
-		}
-		logger.info("Fetching billing address: " + customer.getShippingId());
-		if (IUtils.isNull(billRepo)) {
-			logger.info("Billing repository is null");
-		}
-		BillingDTO billing = null;
-		if (!IUtils.isNullOrEmpty(customer.getBillingId())) {
-			billing = IDemoUtils.wrapInDTO(
-					billRepo.findById(customer.getBillingId()), BillingDTO.class);
-		} else {
-			billing = IDemoUtils.wrapInDTO(
-					billRepo.save(new BillingAddress()), BillingDTO.class);
-			customer.setBillingId(billing.getId());
-			custRepo.save(IDemoUtils.wrapInDTO(customer, Customer.class));
-		}
-		return billing;
 	}
 
 	/**
