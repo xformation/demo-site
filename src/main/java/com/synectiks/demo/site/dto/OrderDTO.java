@@ -12,6 +12,7 @@ public class OrderDTO implements DemoDTO {
 	public static final String ORDER_SESSION_KEY = "orderObj";
 
 	private String id;
+	private String ssmId;
 	private String cartId;
 	private String customerId;
 	private String billingId;
@@ -27,6 +28,14 @@ public class OrderDTO implements DemoDTO {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getSsmId() {
+		return ssmId;
+	}
+
+	public void setSsmId(String ssmId) {
+		this.ssmId = ssmId;
 	}
 
 	public String getCartId() {

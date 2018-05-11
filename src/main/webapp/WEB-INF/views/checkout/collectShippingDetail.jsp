@@ -14,6 +14,7 @@
 		</div>
 		<form:form action="${pageContext.request.contextPath}/shopping/saveShipping" modelAttribute="orderDTO" class="form">
 			<form:hidden path="cartId" name="cartId"/>
+			<form:hidden path="ssmId" name="ssmId"/>
 			<form:hidden path="customerId" name="customerId"/>
 			<form:hidden path="billingId" name="billingId"/>
 			<form:hidden path="shippingId" name="shippingId"/>

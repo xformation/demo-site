@@ -129,6 +129,10 @@ public class CustomerDTO implements DemoDTO {
 			builder.append(builder.length() > 2 ? ", " : "");
 			builder.append("\"username\": \"" + username + "\"");
 		}
+		if (!IUtils.isNullOrEmpty(password)) {
+			builder.append(builder.length() > 2 ? ", " : "");
+			builder.append("\"password\": \"" + password + "\"");
+		}
 		if (!IUtils.isNullOrEmpty(cartId)) {
 			builder.append(builder.length() > 2 ? ", " : "");
 			builder.append("\"cartId\": \"" + cartId + "\"");

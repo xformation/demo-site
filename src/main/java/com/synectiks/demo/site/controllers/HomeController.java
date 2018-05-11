@@ -66,7 +66,7 @@ public class HomeController {
 		logger.info("Form: " + form + "\nModel: " + model);
 		CustomerDTO customer = IDemoUtils.wrapInDTO(
 				custRepo.findByUsername(form.getUsername()), CustomerDTO.class);
-		if (!IUtils.isNull(customer)) {
+		if (!IUtils.isNull(customer) && !IUtils.isNull(customer.getPassword())) {
 			if (customer.getPassword().equals(form.getPassword())) {
 				customer.setPassword(null);
 				request.getSession().setAttribute(IDemoUtils.CUR_CUSTOMER, customer);

@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import com.synectiks.commons.constants.IConsts;
 import com.synectiks.commons.entities.demo.BillingAddress;
 import com.synectiks.commons.entities.demo.Cart;
 import com.synectiks.commons.entities.demo.CartItem;
@@ -52,6 +52,8 @@ import com.synectiks.demo.site.repositories.ShippingRepository;
 public interface IDemoUtils {
 
 	Logger logger = LoggerFactory.getLogger(IDemoUtils.class);
+
+	String APP_SSMID = "DemoSite";
 
 	String JCR_BASE_URL = "jcr.repo.server.url";
 	String JCR_DOWNLOAD_FILE = "jcr.download.file";
@@ -184,14 +186,16 @@ public interface IDemoUtils {
 			if (!IUtils.isNull(cart)) {
 				for (String itemId : cart.getCartItems()) {
 					CartItem cItem = cartItemRepo.findById(itemId);
-					if (!IUtils.isNull(cItem) && !IUtils.isNullOrEmpty(cItem.getProductId())) {
-						Product prod = productRepo.findById(cItem.getProductId());
-						// Update items quantity
-						prod.setStockCount(prod.getStockCount() - cItem.getQuantity());
-						productRepo.save(prod);
+					if (!IUtils.isNull(cItem)) {
+						if (!IUtils.isNullOrEmpty(cItem.getProductId())) {
+							Product prod = productRepo.findById(cItem.getProductId());
+							// Update items quantity
+							prod.setStockCount(prod.getStockCount() - cItem.getQuantity());
+							productRepo.save(prod);
+						}
+						cItem.setState("SOLD");
+						cartItemRepo.save(cItem);
 					}
-					cItem.setState("SOLD");
-					cartItemRepo.save(cItem);
 				}
 				Customer cust = custRepo.findById(cart.getCustomerId());
 				cust.setCartId(null);
@@ -426,21 +430,6 @@ public interface IDemoUtils {
 
 	/**
 	 * Method to construct create node url.
-	 * @param env
-	 * @param apiKey
-	 * @return
-	 */
-	static String getApiUrl(Environment env, String apiKey) {
-		StringBuilder sb = new StringBuilder();
-		String val = env.getProperty(JCR_BASE_URL);
-		sb.append(IUtils.isNullOrEmpty(val) ? "" : val);
-		val = env.getProperty(apiKey);
-		sb.append(IUtils.isNullOrEmpty(val) ? "" : val);
-		return sb.toString();
-	}
-
-	/**
-	 * Method to construct create node url.
 	 * @param baseUrl
 	 * @param apiPath
 	 * @return
@@ -497,6 +486,35 @@ public interface IDemoUtils {
 			}
 		}
 		return result.toString();
+	}
+
+	/**
+	 * Method to get machine created on state machine
+	 * @param username
+	 * @param cartId
+	 * @return
+	 */
+	static String createStateMachine(String username, String cartId) {
+		String ssmId = APP_SSMID + ":" + username + ":" + cartId;
+		/*Map<String, Object> params = new HashMap<>();
+		params.put(IConsts.PRM_MACHINE_ID, ssmId);
+		try {
+			return IUtils.getStringFromPostReq(url, params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}*/
+		return ssmId;
+	}
+
+	static void sendSsmEvent(String url, String ssmId, String event) {
+		Map<String, Object> params = new HashMap<>();
+		params.put(IConsts.PRM_MACHINE_ID, ssmId);
+		params.put(IConsts.PRM_EVENT, event);
+		try {
+			IUtils.getStringFromPostReq(url, params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
 	}
 
 }
