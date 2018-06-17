@@ -41,9 +41,19 @@
 		<constructor-arg value="${amazon.aws.accesskey}" />
 		<constructor-arg value="${amazon.aws.secretkey}" />
 	</bean>
+	<bean id="mtContextProvider"
+			class="com.salesforce.dynamodbv2.mt.context.impl.MTAmazonDynamoDBContextProviderImpl">
+		<constructor-arg value="${multitenant.context.key}" />
+	</bean>
 	<bean id="amazonDynamoDB" class="com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient">
 		<constructor-arg ref="amazonAWSCredentials" />
 		<property name="endpoint" value="${amazon.dynamodb.endpoint}" />
+	</bean>
+	<bean id="mtDynamoTable" class="com.salesforce.dynamodbv2.mt.mappers.MTAmazonDynamoDBByTable">
+		<constructor-arg ref="mtContextProvider" />
+		<constructor-arg ref="amazonDynamoDB" />
+		<constructor-arg value="." />
+		<constructor-arg value="${synecticks.customer.table.prefix}" />
 	</bean>
 	<bean id="dynamoDBMapper" class="com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper">
 		<constructor-arg ref="amazonDynamoDB"/>
