@@ -69,7 +69,7 @@ public class CheckoutController {
 			HttpServletRequest request, Model model) {
 		CustomerDTO customer = IDemoUtils.validateUser(request);
 		logger.info("CartId: " + cartId);
-		Cart cart = cartRepo.findById(cartId);
+		Cart cart = cartRepo.findById(cartId).orElse(null);
 		String retView = null;
 		if (IUtils.isNull(cart)) {
 			logger.info("Invalid cart id: " + cartId);

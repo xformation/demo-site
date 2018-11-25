@@ -46,7 +46,7 @@ public class ProductController {
 			HttpServletRequest request, Model model)
 			throws IOException {
 		ctxPath = request.getContextPath();
-		Product product = productRepo.findById(productId);
+		Product product = productRepo.findById(productId).orElse(null);
 		model.addAttribute(product);
 		String path = request.getServletContext().getRealPath("/");
 		path += "resources/product_images/";

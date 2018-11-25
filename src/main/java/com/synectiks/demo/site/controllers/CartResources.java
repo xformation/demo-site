@@ -74,16 +74,16 @@ public class CartResources {
 		if (IUtils.isNullOrEmpty(customer.getCartId())) {
 			cart = getNewCart(customer);
 		} else {
-			cart = cartRepo.findById(customer.getCartId());
+			cart = cartRepo.findById(customer.getCartId()).orElse(null);
 			if (IUtils.isNull(cart)) {
 				cart = getNewCart(customer);
 			}
 		}
-		Product product = productRepo.findById(productId);
+		Product product = productRepo.findById(productId).orElse(null);
 		List<String> cartItems = cart.getCartItems();
 		if (!IUtils.isNull(cartItems)) {
 			for (String key : cartItems) {
-				CartItem item = cartItemRepo.findById(key);
+				CartItem item = cartItemRepo.findById(key).orElse(null);
 				if (!IUtils.isNull(item) && !IUtils.isNullOrEmpty(productId)
 						&& productId.equals(item.getProductId())) {
 					item.setQuantity(item.getQuantity() + 1);
@@ -117,7 +117,7 @@ public class CartResources {
 			@PathVariable(value = "cartItemId") String cartItemId) {
 		// delete from repository
 		cartItemRepo.delete(cartItemId);
-		Cart cart = cartRepo.findById(cartId);
+		Cart cart = cartRepo.findById(cartId).orElse(null);
 		if (!IUtils.isNull(cart) && !IUtils.isNull(cart.getCartItems())) {
 			cart.getCartItems().remove(cartItemId);
 		}
@@ -126,7 +126,7 @@ public class CartResources {
 	@RequestMapping(value = "/{cartId}", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void clearCart(@PathVariable(value = "cartId") String cartId) {
-		Cart cart = cartRepo.findById(cartId);
+		Cart cart = cartRepo.findById(cartId).orElse(null);
 		for (String itemId : cart.getCartItems()) {
 			cartItemRepo.delete(itemId);
 		}

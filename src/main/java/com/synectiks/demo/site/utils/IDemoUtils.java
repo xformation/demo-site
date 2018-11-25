@@ -182,13 +182,13 @@ public interface IDemoUtils {
 		if (IUtils.isNull(cartId)) {
 			logger.info("Invalid cart id: " + cartId);
 		} else {
-			Cart cart = cartRepo.findById(cartId);
+			Cart cart = cartRepo.findById(cartId).orElse(null);
 			if (!IUtils.isNull(cart)) {
 				for (String itemId : cart.getCartItems()) {
-					CartItem cItem = cartItemRepo.findById(itemId);
+					CartItem cItem = cartItemRepo.findById(itemId).orElse(null);
 					if (!IUtils.isNull(cItem)) {
 						if (!IUtils.isNullOrEmpty(cItem.getProductId())) {
-							Product prod = productRepo.findById(cItem.getProductId());
+							Product prod = productRepo.findById(cItem.getProductId()).orElse(null);
 							// Update items quantity
 							prod.setStockCount(prod.getStockCount() - cItem.getQuantity());
 							productRepo.save(prod);
@@ -197,7 +197,7 @@ public interface IDemoUtils {
 						cartItemRepo.save(cItem);
 					}
 				}
-				Customer cust = custRepo.findById(cart.getCustomerId());
+				Customer cust = custRepo.findById(cart.getCustomerId()).orElse(null);
 				cust.setCartId(null);
 				custRepo.save(cust);
 			}

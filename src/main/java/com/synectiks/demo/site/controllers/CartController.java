@@ -47,7 +47,7 @@ public class CartController {
 		if (IUtils.isNullOrEmpty(customer.getCartId())) {
 			cart = getNewCart(customer);
 		} else {
-			cart = cartRepo.findById(customer.getCartId());
+			cart = cartRepo.findById(customer.getCartId()).orElse(null);
 			if (IUtils.isNull(cart)) {
 				cart = getNewCart(customer);
 			}

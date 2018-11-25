@@ -52,14 +52,14 @@ public class OrderController {
 	public String createOrder(@PathVariable("cartId") String cartId,
 			HttpServletRequest request) {
 		logger.info("CartId: " + cartId);
-		Cart cart = cartRepo.findById(cartId);
+		Cart cart = cartRepo.findById(cartId).orElse(null);
 		if (IUtils.isNull(cart)) {
 			logger.info("Invalid cart id: " + cartId);
 		} else {
 			CustomerOrder customerOrder = new CustomerOrder();
 			customerOrder.setCartId(cartId);
 
-			Customer customer = custRepo.findById(cart.getCustomerId());
+			Customer customer = custRepo.findById(cart.getCustomerId()).orElse(null);
 			customerOrder.setCustomerId(customer.getId());
 			customerOrder.setBillingId(customer.getBillingId());
 			customerOrder.setShippingId(customer.getShippingId());

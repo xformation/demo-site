@@ -205,7 +205,7 @@ public class AdminProductController {
 		if (Files.exists(path)) {
 			try {
 				Files.delete(path);
-				Product prod = prodRepo.findById(id);
+				Product prod = prodRepo.findById(id).orElse(null);
 				// Save image into jcr repository
 				String nodePath = String.format(
 						IDemoUtils.JCR_IMAGE_PATH, prod.getCategory());
