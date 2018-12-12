@@ -9,7 +9,8 @@
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 	<meta name="description" content="In Itesca Product Store you can buy items online.">
 	<meta name="author" content="Rajesh Kumar Upadhyay">
-	<link rel="icon" href="<c:url value="/resources/site-images/favicon.ico" />">
+	<c:url value="/site-images/favicon.ico" var="favicon"/>
+	<link rel="icon" href="${favicon}" />">
 	
 	<title>Itesca Store</title>
 	

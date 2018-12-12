@@ -58,8 +58,8 @@ public class HomeController {
 	}
 
 	@RequestMapping("/signin")
-	public String login(@Valid @ModelAttribute("login") Login form,
-			Model model, HttpServletRequest request) {
+	public String login(@Valid @ModelAttribute("login") Login form, Model model,
+			HttpServletRequest request) {
 		String error = null;
 		String redirectUrl = form.getRedirect();
 		String redirect = "redirect:/";

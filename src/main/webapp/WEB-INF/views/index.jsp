@@ -1,8 +1,8 @@
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@include file="/WEB-INF/views/templates/header.jsp"%>
+<%@include file="templates/header.jsp"%>
 
 
-<!-- Carosel
+<!-- Carousel
 ================================================== -->
 <div id="myCarousel" class="carousel slide" data-ride="carousel">
 	<!-- Indicators -->
@@ -14,7 +14,7 @@
 	<div class="carousel-inner" role="listbox">
 		<div class="item active">
 			<img class="first-slide base-image"
-				src="resources/site-images/cover1.jpg" alt="First slide">
+				src="site-images/cover1.jpg" alt="First slide">
 			<div class="container">
 				<div class="carousel-caption">
 					<h1>Welcome to the ITESCA Store!</h1>
@@ -25,7 +25,7 @@
 		</div>
 		<div class="item">
 			<img class="second-slide base-image"
-				src="resources/site-images/cover-4.jpg" alt="Second slide">
+				src="site-images/cover-4.jpg" alt="Second slide">
 			<div class="container">
 				<div class="carousel-caption">
 					<h1>Express your personality!</h1>
@@ -35,7 +35,7 @@
 		</div>
 		<div class="item">
 			<img class="third-slide base-image"
-				src="resources/site-images/cover-8.jpg" alt="Third slide">
+				src="site-images/cover-8.jpg" alt="Third slide">
 			<div class="container">
 				<div class="carousel-caption">
 					<h1>Let the music be with you!</h1>
@@ -64,7 +64,7 @@
 	<!-- Three columns of text below the carousel -->
 	<div class="row">
 		<div class="col-lg-4">
-			<img class="img-circle" src="resources/site-images/circle-1.jpg"
+			<img class="img-circle" src="site-images/circle-1.jpg"
 				width="140" height="140">
 			<h2>HD Cam Sumergible</h2>
 			<p>Do not miss any special moment, capture them in HD with our products.</p>
@@ -75,7 +75,7 @@
 		</div>
 		<!-- /.col-lg-4 -->
 		<div class="col-lg-4">
-			<img class="img-circle" src="resources/site-images/circle-3.jpg"
+			<img class="img-circle" src="site-images/circle-3.jpg"
 				width="140" height="140">
 			<h2>Shelter for Lady</h2>
 			<p>Make the weather your best ally, wear your style with this seasonal coat.</p>
@@ -86,9 +86,9 @@
 		</div>
 		<!-- /.col-lg-4 -->
 		<div class="col-lg-4">
-			<img class="img-circle" src="resources/site-images/circle-2.jpg"
+			<img class="img-circle" src="site-images/circle-2.jpg"
 				width="140" height="140">
-			<h2>Desktop Gamer</h2>
+			<h2>Desktop Gramer</h2>
 			<p>Enjoy your games in HD with this desktop computer with graphics dedicated to give you the best gaming experience.</p>
 			<p>
 				<a class="btn btn-default" href="products" role="button">more
@@ -103,4 +103,4 @@
 <br>
 <!-- /.container -->
 
-<%@include file="/WEB-INF/views/templates/footer.jsp"%>
+<%@include file="templates/footer.jsp"%>
