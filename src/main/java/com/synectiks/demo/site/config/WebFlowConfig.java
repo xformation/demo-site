@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.webflow.config.AbstractFlowConfiguration;
@@ -23,7 +25,8 @@ import org.springframework.webflow.mvc.builder.MvcViewFactoryCreator;
  */
 @Configuration
 @EnableWebMvc
-public class WebFlowConfig extends AbstractFlowConfiguration {
+public class WebFlowConfig
+		extends AbstractFlowConfiguration implements WebMvcConfigurer {
 
 	@Autowired
 	private LocalValidatorFactoryBean localValidatorFacotryBean;
@@ -53,8 +56,7 @@ public class WebFlowConfig extends AbstractFlowConfiguration {
 	@Bean
 	public MvcViewFactoryCreator mvcViewFactoryCreator() {
 		MvcViewFactoryCreator factoryCreator = new MvcViewFactoryCreator();
-		factoryCreator.setViewResolvers(
-				Collections.singletonList(this.viewResolver()));
+		factoryCreator.setViewResolvers(Collections.singletonList(this.viewResolver()));
 		factoryCreator.setUseSpringBeanBinding(true);
 		return factoryCreator;
 	}
@@ -66,5 +68,10 @@ public class WebFlowConfig extends AbstractFlowConfiguration {
 		viewResolver.setPrefix("/WEB-INF/views/");
 		viewResolver.setSuffix(".jsp");
 		return viewResolver;
+	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 	}
 }
